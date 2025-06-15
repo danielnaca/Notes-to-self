@@ -1,6 +1,6 @@
 # Notes to Self
 
-A simple iOS application for taking personal notes, built with Swift and SwiftData.
+A simple iOS application for taking personal notes and displaying them to you out of context, built with Swift and SwiftData.
 
 ## Features
 
