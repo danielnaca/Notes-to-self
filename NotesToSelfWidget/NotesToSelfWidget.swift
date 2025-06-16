@@ -7,78 +7,134 @@
 
 import WidgetKit
 import SwiftUI
+import AppIntents
 
-struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), emoji: "😀")
+// MARK: - Shared Model
+struct Note: Identifiable, Codable, Equatable {
+    let id: UUID
+    let text: String
+    let date: Date
+}
+
+struct NotesData: Codable {
+    var notes: [Note]
+    var currentIndex: Int
+}
+
+let appGroupID = "group.co.uk.cursive.NotesToSelf"
+let notesKey = "notes"
+let indexKey = "currentIndex"
+
+// MARK: - App Intent
+struct NextNoteIntent: AppIntent {
+    static var title: LocalizedStringResource = "Next Note"
+    static var description = IntentDescription("Show the next note in the widget.")
+    
+    func perform() async throws -> some IntentResult {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return .result() }
+        let notes: [Note]
+        if let data = ud.data(forKey: notesKey), let decoded = try? JSONDecoder().decode([Note].self, from: data) {
+            notes = decoded
+        } else {
+            notes = []
+        }
+        guard !notes.isEmpty else { return .result() }
+        var idx = ud.integer(forKey: indexKey)
+        idx = (idx + 1) % notes.count
+        ud.set(idx, forKey: indexKey)
+        WidgetCenter.shared.reloadAllTimelines()
+        return .result()
     }
+}
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), emoji: "😀")
+// MARK: - Timeline Provider
+struct NotesProvider: TimelineProvider {
+    func placeholder(in context: Context) -> NotesEntry {
+        NotesEntry(date: Date(), note: Note(id: UUID(), text: "Sample note", date: Date()))
+    }
+    func getSnapshot(in context: Context, completion: @escaping (NotesEntry) -> Void) {
+        let entry = loadEntry()
         completion(entry)
     }
-
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, emoji: "😀")
-            entries.append(entry)
-        }
-
-        let timeline = Timeline(entries: entries, policy: .atEnd)
+    func getTimeline(in context: Context, completion: @escaping (Timeline<NotesEntry>) -> Void) {
+        let entry = loadEntry()
+        let timeline = Timeline(entries: [entry], policy: .never)
         completion(timeline)
     }
-
-//    func relevances() async -> WidgetRelevances<Void> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
-}
-
-struct SimpleEntry: TimelineEntry {
-    let date: Date
-    let emoji: String
-}
-
-struct NotesToSelfWidgetEntryView : View {
-    var entry: Provider.Entry
-
-    var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Emoji:")
-            Text(entry.emoji)
+    private func loadEntry() -> NotesEntry {
+        guard let ud = UserDefaults(suiteName: appGroupID) else {
+            return NotesEntry(date: Date(), note: Note(id: UUID(), text: "No notes", date: Date()))
         }
+        let notes: [Note]
+        if let data = ud.data(forKey: notesKey), let decoded = try? JSONDecoder().decode([Note].self, from: data) {
+            notes = decoded
+        } else {
+            notes = []
+        }
+        let idx = ud.integer(forKey: indexKey)
+        let note = (!notes.isEmpty && idx < notes.count) ? notes[idx] : Note(id: UUID(), text: "No notes", date: Date())
+        return NotesEntry(date: Date(), note: note)
     }
 }
 
-struct NotesToSelfWidget: Widget {
-    let kind: String = "NotesToSelfWidget"
+struct NotesEntry: TimelineEntry {
+    let date: Date
+    let note: Note
+}
 
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            if #available(iOS 17.0, *) {
-                NotesToSelfWidgetEntryView(entry: entry)
-                    .containerBackground(.fill.tertiary, for: .widget)
-            } else {
-                NotesToSelfWidgetEntryView(entry: entry)
-                    .padding()
-                    .background()
+// MARK: - Widget
+struct NotesToSelfWidgetEntryView: View {
+    var entry: NotesEntry
+    @Environment(\.widgetFamily) var widgetFamily
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Text content
+                Text(entry.note.text)
+                    .foregroundColor(AppColors.widgetText)
+                    .font(widgetFamily == .systemSmall ? AppTypography.widgetSmallFont : AppTypography.widgetLargeFont)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    .padding(AppPadding.widgetTextPadding)
+                
+                // Button absolutely positioned at bottom-right corner
+                ZStack {
+                    Button(intent: NextNoteIntent()) {
+                        Circle()
+                            .fill(AppColors.widgetButtonInvisible)
+                            .frame(width: AppDimensions.widgetButtonInvisibleSize, height: AppDimensions.widgetButtonInvisibleSize)
+                    }
+                    .opacity(0.01)
+                    Circle()
+                        .fill(AppColors.widgetButtonVisible)
+                        .frame(width: AppDimensions.widgetButtonVisibleSize, height: AppDimensions.widgetButtonVisibleSize)
+                }
+                .position(x: geometry.size.width, y: geometry.size.height)
             }
         }
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
+        .containerBackground(AppColors.widgetBackground, for: .widget)
     }
 }
 
-#Preview(as: .systemSmall) {
-    NotesToSelfWidget()
-} timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
+struct NotesToSelfWidgetEntryView_Previews: PreviewProvider {
+    static var previews: some View {
+        NotesToSelfWidgetEntryView(entry: NotesEntry(date: .now, note: Note(id: UUID(), text: "Preview note", date: .now)))
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+    }
+}
+
+@main
+struct NotesToSelfWidget: Widget {
+    let kind: String = "NotesToSelfWidget"
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: NotesProvider()) { entry in
+            NotesToSelfWidgetEntryView(entry: entry)
+        }
+        .configurationDisplayName("Notes to Self")
+        .description("View your saved notes and cycle through them.")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+    }
 }

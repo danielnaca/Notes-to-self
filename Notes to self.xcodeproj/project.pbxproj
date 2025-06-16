@@ -6,14 +6,76 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BE407C682DFE5D680048CE1A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE407C672DFE5D680048CE1A /* WidgetKit.framework */; };
+		BE407C6A2DFE5D680048CE1A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE407C692DFE5D680048CE1A /* SwiftUI.framework */; };
+		BE407C772DFE5D6A0048CE1A /* NotesToSelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BE407C652DFE5D680048CE1A /* NotesToSelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BE407C752DFE5D6A0048CE1A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE407C492DFE5A450048CE1A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE407C642DFE5D680048CE1A;
+			remoteInfo = NotesToSelfWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BE407C7C2DFE5D6A0048CE1A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BE407C772DFE5D6A0048CE1A /* NotesToSelfWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		BE407C512DFE5A450048CE1A /* Notes to self.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Notes to self.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE407C652DFE5D680048CE1A /* NotesToSelfWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotesToSelfWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE407C672DFE5D680048CE1A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		BE407C692DFE5D680048CE1A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		BE407C7E2DFE5E8B0048CE1A /* NotesToSelfWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotesToSelfWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BE407C782DFE5D6A0048CE1A /* Exceptions for "NotesToSelfWidget" folder in "NotesToSelfWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BE407C642DFE5D680048CE1A /* NotesToSelfWidgetExtension */;
+		};
+		BEF862B72DFF983A00E43E98 /* Exceptions for "Notes to self" folder in "NotesToSelfWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Styling.swift,
+			);
+			target = BE407C642DFE5D680048CE1A /* NotesToSelfWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BE407C532DFE5A450048CE1A /* Notes to self */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BEF862B72DFF983A00E43E98 /* Exceptions for "Notes to self" folder in "NotesToSelfWidgetExtension" target */,
+			);
 			path = "Notes to self";
+			sourceTree = "<group>";
+		};
+		BE407C6B2DFE5D680048CE1A /* NotesToSelfWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BE407C782DFE5D6A0048CE1A /* Exceptions for "NotesToSelfWidget" folder in "NotesToSelfWidgetExtension" target */,
+			);
+			path = NotesToSelfWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +88,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BE407C622DFE5D680048CE1A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE407C6A2DFE5D680048CE1A /* SwiftUI.framework in Frameworks */,
+				BE407C682DFE5D680048CE1A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		BE407C482DFE5A450048CE1A = {
 			isa = PBXGroup;
 			children = (
+				BE407C7E2DFE5E8B0048CE1A /* NotesToSelfWidgetExtension.entitlements */,
 				BE407C532DFE5A450048CE1A /* Notes to self */,
+				BE407C6B2DFE5D680048CE1A /* NotesToSelfWidget */,
+				BE407C662DFE5D680048CE1A /* Frameworks */,
 				BE407C522DFE5A450048CE1A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +115,18 @@
 			isa = PBXGroup;
 			children = (
 				BE407C512DFE5A450048CE1A /* Notes to self.app */,
+				BE407C652DFE5D680048CE1A /* NotesToSelfWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BE407C662DFE5D680048CE1A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BE407C672DFE5D680048CE1A /* WidgetKit.framework */,
+				BE407C692DFE5D680048CE1A /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +139,12 @@
 				BE407C4D2DFE5A450048CE1A /* Sources */,
 				BE407C4E2DFE5A450048CE1A /* Frameworks */,
 				BE407C4F2DFE5A450048CE1A /* Resources */,
+				BE407C7C2DFE5D6A0048CE1A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BE407C762DFE5D6A0048CE1A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				BE407C532DFE5A450048CE1A /* Notes to self */,
@@ -69,6 +155,28 @@
 			productName = "Notes to self";
 			productReference = BE407C512DFE5A450048CE1A /* Notes to self.app */;
 			productType = "com.apple.product-type.application";
+		};
+		BE407C642DFE5D680048CE1A /* NotesToSelfWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE407C792DFE5D6A0048CE1A /* Build configuration list for PBXNativeTarget "NotesToSelfWidgetExtension" */;
+			buildPhases = (
+				BE407C612DFE5D680048CE1A /* Sources */,
+				BE407C622DFE5D680048CE1A /* Frameworks */,
+				BE407C632DFE5D680048CE1A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BE407C6B2DFE5D680048CE1A /* NotesToSelfWidget */,
+			);
+			name = NotesToSelfWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = NotesToSelfWidgetExtension;
+			productReference = BE407C652DFE5D680048CE1A /* NotesToSelfWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +189,9 @@
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					BE407C502DFE5A450048CE1A = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					BE407C642DFE5D680048CE1A = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -100,12 +211,20 @@
 			projectRoot = "";
 			targets = (
 				BE407C502DFE5A450048CE1A /* Notes to self */,
+				BE407C642DFE5D680048CE1A /* NotesToSelfWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		BE407C4F2DFE5A450048CE1A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE407C632DFE5D680048CE1A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +241,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BE407C612DFE5D680048CE1A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BE407C762DFE5D6A0048CE1A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE407C642DFE5D680048CE1A /* NotesToSelfWidgetExtension */;
+			targetProxy = BE407C752DFE5D6A0048CE1A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BE407C5C2DFE5A470048CE1A /* Debug */ = {
@@ -251,6 +385,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Notes to self/Notes to self.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 56D49LEJ39;
@@ -261,6 +397,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -279,6 +416,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Notes to self/Notes to self.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 56D49LEJ39;
@@ -289,6 +428,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -296,6 +436,62 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.uk.cursive.Notes-to-self";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BE407C7A2DFE5D6A0048CE1A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = NotesToSelfWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 56D49LEJ39;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NotesToSelfWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NotesToSelfWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.uk.cursive.Notes-to-self.NotesToSelfWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BE407C7B2DFE5D6A0048CE1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = NotesToSelfWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 56D49LEJ39;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NotesToSelfWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NotesToSelfWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.uk.cursive.Notes-to-self.NotesToSelfWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -319,6 +515,15 @@
 			buildConfigurations = (
 				BE407C5F2DFE5A470048CE1A /* Debug */,
 				BE407C602DFE5A470048CE1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BE407C792DFE5D6A0048CE1A /* Build configuration list for PBXNativeTarget "NotesToSelfWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE407C7A2DFE5D6A0048CE1A /* Debug */,
+				BE407C7B2DFE5D6A0048CE1A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
