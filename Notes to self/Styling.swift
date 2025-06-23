@@ -20,8 +20,12 @@ struct AppColors {
     static let composerBackground = accent
     static let listBackground = white
     static let appBackground = palegrey
+    static let background = white
+    static let inputBackground = Color(red: 0.95, green: 0.95, blue: 0.97)
     static let noteText = black
     static let placeholderText = palegrey
+    static let secondaryText = darkgrey
+    static let tertiaryText = Color.gray.opacity(0.5)
     static let textFieldBorder = palegrey
     static let settingsButton = accent
     

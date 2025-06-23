@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// 📗 Settings Screen: Configuration screen for app preferences
 struct SettingsView: View {
     @EnvironmentObject var store: NotesStore
     @Environment(\.dismiss) private var dismiss

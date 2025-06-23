@@ -10,12 +10,6 @@ import SwiftUI
 import AppIntents
 
 // MARK: - Shared Model
-struct Note: Identifiable, Codable, Equatable {
-    let id: UUID
-    let text: String
-    let date: Date
-}
-
 struct NotesData: Codable {
     var notes: [Note]
     var currentIndex: Int
