@@ -1,5 +1,7 @@
 # Notes to Self
 
+This is an iOS 18 project, it does ios 26 features
+
 A simple iOS application for taking personal notes and displaying them to you out of context, built with Swift and SwiftData.
 
 ## Features
