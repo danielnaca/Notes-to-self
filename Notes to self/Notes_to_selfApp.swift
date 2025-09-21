@@ -19,6 +19,7 @@ struct Notes_to_selfApp: App {
             ContentView()
                 .environmentObject(store)
                 .onAppear {
+                    print("📱 App appeared - NotesStore created")
                     store.refreshNotificationQueue()
                 }
                 .alert("Enable Notifications", isPresented: $store.showNotificationAlert) {

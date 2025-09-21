@@ -4,11 +4,18 @@ import SwiftUI
 struct ExpandingTextView: View {
     @Binding var text: String
     let placeholder: String
+    let onSubmit: (() -> Void)?
     @State private var textHeight: CGFloat = 36 // Start with single line height
     
     private let lineHeight: CGFloat = 22 // Approximate line height for system font
     private let verticalPadding: CGFloat = 14 // Top + bottom padding
     private let maxHeight: CGFloat = 120 // Maximum height before scrolling
+    
+    init(text: Binding<String>, placeholder: String, onSubmit: (() -> Void)? = nil) {
+        self._text = text
+        self.placeholder = placeholder
+        self.onSubmit = onSubmit
+    }
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -33,6 +40,9 @@ struct ExpandingTextView: View {
                 }
                 .onChange(of: text) { _, newValue in
                     updateHeight(for: newValue)
+                }
+                .onSubmit {
+                    onSubmit?()
                 }
         }
     }

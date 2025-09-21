@@ -44,7 +44,7 @@ struct NextNoteIntent: AppIntent {
 // MARK: - Timeline Provider
 struct NotesProvider: TimelineProvider {
     func placeholder(in context: Context) -> NotesEntry {
-        NotesEntry(date: Date(), note: Note(id: UUID(), text: "Sample note", date: Date()))
+        NotesEntry(date: Date(), note: Note(id: UUID(), text: "Sample note", date: Date(), lastModified: Date()))
     }
     func getSnapshot(in context: Context, completion: @escaping (NotesEntry) -> Void) {
         let entry = loadEntry()
@@ -57,7 +57,7 @@ struct NotesProvider: TimelineProvider {
     }
     private func loadEntry() -> NotesEntry {
         guard let ud = UserDefaults(suiteName: appGroupID) else {
-            return NotesEntry(date: Date(), note: Note(id: UUID(), text: "No notes", date: Date()))
+            return NotesEntry(date: Date(), note: Note(id: UUID(), text: "No notes", date: Date(), lastModified: Date()))
         }
         let notes: [Note]
         if let data = ud.data(forKey: notesKey), let decoded = try? JSONDecoder().decode([Note].self, from: data) {
@@ -66,7 +66,7 @@ struct NotesProvider: TimelineProvider {
             notes = []
         }
         let idx = ud.integer(forKey: indexKey)
-        let note = (!notes.isEmpty && idx < notes.count) ? notes[idx] : Note(id: UUID(), text: "No notes", date: Date())
+        let note = (!notes.isEmpty && idx < notes.count) ? notes[idx] : Note(id: UUID(), text: "No notes", date: Date(), lastModified: Date())
         return NotesEntry(date: Date(), note: note)
     }
 }
@@ -115,7 +115,7 @@ struct NotesToSelfWidgetEntryView: View {
 
 struct NotesToSelfWidgetEntryView_Previews: PreviewProvider {
     static var previews: some View {
-        NotesToSelfWidgetEntryView(entry: NotesEntry(date: .now, note: Note(id: UUID(), text: "Preview note", date: .now)))
+        NotesToSelfWidgetEntryView(entry: NotesEntry(date: .now, note: Note(id: UUID(), text: "Preview note", date: .now, lastModified: .now)))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }

@@ -10,15 +10,31 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 // Input section
                 HStack {
-                    ExpandingTextView(text: $store.newNote, placeholder: "What's on your mind?")
+                    ExpandingTextView(
+                        text: $store.newNote, 
+                        placeholder: "What's on your mind?",
+                        onSubmit: {
+                            if store.isEditing {
+                                store.updateNote()
+                            } else {
+                                store.addNote()
+                            }
+                        }
+                    )
                         .frame(minHeight: 44)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(AppColors.inputBackground)
                         .cornerRadius(22)
                     
-                    Button(action: store.addNote) {
-                        Image(systemName: "plus.circle.fill")
+                    Button(action: {
+                        if store.isEditing {
+                            store.updateNote()
+                        } else {
+                            store.addNote()
+                        }
+                    }) {
+                        Image(systemName: store.isEditing ? "checkmark.circle.fill" : "plus.circle.fill")
                             .font(.title2)
                             .foregroundColor(AppColors.accent)
                     }
@@ -46,6 +62,9 @@ struct ContentView: View {
                     List {
                         ForEach(store.notes) { note in
                             NoteItemView(note: note)
+                                .onTapGesture {
+                                    store.startEditing(note: note)
+                                }
                         }
                         .onDelete(perform: store.delete)
                     }

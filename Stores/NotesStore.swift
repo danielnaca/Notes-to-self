@@ -10,6 +10,7 @@ class NotesStore: ObservableObject {
     @Published var newNote: String = ""
     @Published var currentIndex: Int = 0 { didSet { save() } }
     @Published var showNotificationAlert = false
+    @Published var editingNoteId: UUID? = nil
     
     private let appGroupID = "group.co.uk.cursive.NotesToSelf"
     private let notesKey = "notes"
@@ -24,6 +25,40 @@ class NotesStore: ObservableObject {
         guard !trimmed.isEmpty else { return }
         notes.insert(Note(text: trimmed), at: 0)
         newNote = ""
+        editingNoteId = nil
+    }
+    
+    func updateNote() {
+        let trimmed = newNote.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let editingId = editingNoteId else { return }
+        
+        if let index = notes.firstIndex(where: { $0.id == editingId }) {
+            let originalNote = notes[index]
+            let updatedNote = Note(
+                id: originalNote.id,
+                text: trimmed,
+                date: originalNote.date,
+                lastModified: Date()
+            )
+            notes[index] = updatedNote
+        }
+        
+        newNote = ""
+        editingNoteId = nil
+    }
+    
+    func startEditing(note: Note) {
+        newNote = note.text
+        editingNoteId = note.id
+    }
+    
+    func cancelEditing() {
+        newNote = ""
+        editingNoteId = nil
+    }
+    
+    var isEditing: Bool {
+        editingNoteId != nil
     }
     
     func delete(at offsets: IndexSet) {
@@ -94,10 +129,35 @@ class NotesStore: ObservableObject {
     }
     
     private func load() {
-        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
-        if let data = ud.data(forKey: notesKey), let decoded = try? JSONDecoder().decode([Note].self, from: data) {
-            notes = decoded
+        guard let ud = UserDefaults(suiteName: appGroupID) else { 
+            print("Failed to access UserDefaults")
+            return 
         }
+        
+        // Temporary debugging
+        print("=== DEBUGGING STORAGE ===")
+        let allKeys = ud.dictionaryRepresentation().keys
+        print("All keys: \(Array(allKeys))")
+        
+        if let data = ud.data(forKey: notesKey) {
+            print("Data size: \(data.count) bytes")
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Raw JSON: \(jsonString)")
+            }
+            
+            do {
+                let decoded = try JSONDecoder().decode([Note].self, from: data)
+                print("Decoded \(decoded.count) notes")
+                notes = decoded
+            } catch {
+                print("Decode error: \(error)")
+            }
+        } else {
+            print("No data found for key: \(notesKey)")
+        }
+        
         currentIndex = ud.integer(forKey: indexKey)
+        print("Current index: \(currentIndex)")
+        print("=== END DEBUGGING ===")
     }
 } 

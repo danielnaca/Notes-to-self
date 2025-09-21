@@ -1,0 +1,37 @@
+{
+    "ColorsCollection": {
+        "background": {
+            "basePrimary": "#ffffff",
+            "baseSecondary": "#f5f5f5",
+            "invertPrimary": "#141414",
+            "accent": "hues/accent"
+        },
+        "foreground": {
+            "basePrimary": "#141414",
+            "invertPrimary": "#ffffff",
+            "baseSecondary": "#00000099",
+            "invertSecondary": "#ffffffcc",
+            "accent": "hues/accent"
+        },
+        "stroke": {
+            "horizontalRule": "#00000019",
+            "basePrimary": "foreground/basePrimary",
+            "baseSecondary": "foreground/baseSecondary",
+            "accent": "hues/accent"
+        },
+        "status": {
+            "info": "#34484c",
+            "success": "#07a023",
+            "warning": "#d6b707",
+            "alert": "#b51010"
+        },
+        "formControls": {
+            "disabled": "#dcdcdc",
+            "error": "status/alert"
+        },
+        "hues": {
+            "accent": "#f08e80",
+            "yellow": "#ffbf00"
+        }
+    }
+}
