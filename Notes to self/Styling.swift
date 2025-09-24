@@ -34,6 +34,7 @@ struct AppColors {
     static let widgetText = white
     static let widgetButtonInvisible = Color(red: 0/255, green: 0/255, blue: 105/255)
     static let widgetButtonVisible = white
+    static let widgetButtonBorder = white
 }
 
 // MARK: - Dimensions
@@ -85,4 +86,5 @@ struct AppTypography {
     // ----- NotesToSelfWidget.swift -----
     static let widgetSmallFont = Font.caption
     static let widgetLargeFont = Font.body
+    static let widgetDateTimeFont = Font.caption2
 } 

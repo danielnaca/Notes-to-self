@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import UserNotifications
+import UniformTypeIdentifiers
 
 // 📗 Notes Data Store: Manages all note data and operations
 class NotesStore: ObservableObject {
@@ -11,6 +12,8 @@ class NotesStore: ObservableObject {
     @Published var currentIndex: Int = 0 { didSet { save() } }
     @Published var showNotificationAlert = false
     @Published var editingNoteId: UUID? = nil
+    @Published var showImportExportAlert = false
+    @Published var importExportMessage = ""
     
     private let appGroupID = "group.co.uk.cursive.NotesToSelf"
     private let notesKey = "notes"
@@ -160,4 +163,107 @@ class NotesStore: ObservableObject {
         print("Current index: \(currentIndex)")
         print("=== END DEBUGGING ===")
     }
+    
+    // MARK: - Import/Export Functions
+    
+    func exportNotes() -> URL? {
+        let exportData = NotesExportData(
+            notes: notes,
+            exportDate: Date(),
+            appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown",
+            totalNotes: notes.count
+        )
+        
+        guard let data = try? JSONEncoder().encode(exportData) else {
+            importExportMessage = "Failed to export notes"
+            showImportExportAlert = true
+            return nil
+        }
+        
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileName = "notes_to_self_export_\(DateFormatter.exportDateFormatter.string(from: Date())).json"
+        let fileURL = documentsPath.appendingPathComponent(fileName)
+        
+        do {
+            try data.write(to: fileURL)
+            return fileURL
+        } catch {
+            importExportMessage = "Failed to save export file: \(error.localizedDescription)"
+            showImportExportAlert = true
+            return nil
+        }
+    }
+    
+    func importNotes(from data: Data) {
+        guard let importData = try? JSONDecoder().decode(NotesExportData.self, from: data) else {
+            importExportMessage = "Invalid file format. Please select a valid Notes to Self export file."
+            showImportExportAlert = true
+            return
+        }
+        
+        let importedNotes = importData.notes
+        var newNotesCount = 0
+        var updatedNotesCount = 0
+        
+        // Create a dictionary of existing notes by UUID for fast lookup
+        var existingNotesMap: [UUID: Note] = [:]
+        for note in notes {
+            existingNotesMap[note.id] = note
+        }
+        
+        var mergedNotes: [Note] = []
+        
+        // Add all existing notes first
+        mergedNotes.append(contentsOf: notes)
+        
+        // Process imported notes
+        for importedNote in importedNotes {
+            if let existingNote = existingNotesMap[importedNote.id] {
+                // UUID conflict - keep the more recently modified note
+                if importedNote.lastModified > existingNote.lastModified {
+                    // Replace existing note with imported one
+                    if let index = mergedNotes.firstIndex(where: { $0.id == importedNote.id }) {
+                        mergedNotes[index] = importedNote
+                        updatedNotesCount += 1
+                    }
+                }
+                // If existing note is newer, keep it (do nothing)
+            } else {
+                // New note - add it
+                mergedNotes.append(importedNote)
+                newNotesCount += 1
+            }
+        }
+        
+        // Update the notes array
+        notes = mergedNotes
+        
+        // Show success message
+        var message = "Import completed successfully!\n"
+        message += "• Added \(newNotesCount) new notes\n"
+        if updatedNotesCount > 0 {
+            message += "• Updated \(updatedNotesCount) existing notes\n"
+        }
+        message += "• Total notes: \(notes.count)"
+        
+        importExportMessage = message
+        showImportExportAlert = true
+    }
+}
+
+// MARK: - Export Data Structure
+struct NotesExportData: Codable {
+    let notes: [Note]
+    let exportDate: Date
+    let appVersion: String
+    let totalNotes: Int
+}
+
+// MARK: - Date Formatter Extension
+extension DateFormatter {
+    static let exportDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        return formatter
+    }()
 } 

@@ -9,9 +9,79 @@ import WidgetKit
 import SwiftUI
 import AppIntents
 
+// MARK: - Widget Note Model
+// Note: This is a widget-specific Note struct that matches the main app's structure
+struct WidgetNote: Identifiable, Codable, Equatable {
+    let id: UUID
+    let text: String
+    let date: Date
+    let lastModified: Date
+    
+    init(id: UUID = UUID(), text: String, date: Date = Date(), lastModified: Date = Date()) {
+        self.id = id
+        self.text = text
+        self.date = date
+        self.lastModified = lastModified
+    }
+    
+    // Custom coding keys to handle backward compatibility
+    enum CodingKeys: String, CodingKey {
+        case id, text, date, lastModified
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        text = try container.decode(String.self, forKey: .text)
+        date = try container.decode(Date.self, forKey: .date)
+        
+        // Handle backward compatibility - if lastModified doesn't exist, use the date
+        if let lastModified = try? container.decode(Date.self, forKey: .lastModified) {
+            self.lastModified = lastModified
+        } else {
+            self.lastModified = date
+        }
+    }
+}
+
+// MARK: - Main App Note Model (for decoding)
+// This matches the main app's Note struct exactly for decoding compatibility
+struct MainAppNote: Identifiable, Codable, Equatable {
+    let id: UUID
+    let text: String
+    let date: Date
+    let lastModified: Date
+    
+    init(id: UUID = UUID(), text: String, date: Date = Date(), lastModified: Date = Date()) {
+        self.id = id
+        self.text = text
+        self.date = date
+        self.lastModified = lastModified
+    }
+    
+    // Custom coding keys to handle backward compatibility
+    enum CodingKeys: String, CodingKey {
+        case id, text, date, lastModified
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        text = try container.decode(String.self, forKey: .text)
+        date = try container.decode(Date.self, forKey: .date)
+        
+        // Handle backward compatibility - if lastModified doesn't exist, use the date
+        if let lastModified = try? container.decode(Date.self, forKey: .lastModified) {
+            self.lastModified = lastModified
+        } else {
+            self.lastModified = date
+        }
+    }
+}
+
 // MARK: - Shared Model
 struct NotesData: Codable {
-    var notes: [Note]
+    var notes: [WidgetNote]
     var currentIndex: Int
 }
 
@@ -25,18 +95,62 @@ struct NextNoteIntent: AppIntent {
     static var description = IntentDescription("Show the next note in the widget.")
     
     func perform() async throws -> some IntentResult {
-        guard let ud = UserDefaults(suiteName: appGroupID) else { return .result() }
-        let notes: [Note]
-        if let data = ud.data(forKey: notesKey), let decoded = try? JSONDecoder().decode([Note].self, from: data) {
-            notes = decoded
+        print("🔍 Widget: NextNoteIntent triggered")
+        
+        guard let ud = UserDefaults(suiteName: appGroupID) else { 
+            print("❌ Widget: Failed to access UserDefaults in NextNoteIntent")
+            return .result() 
+        }
+        
+        let notes: [WidgetNote]
+        if let data = ud.data(forKey: notesKey) {
+            print("📊 Widget: Found data in NextNoteIntent, size: \(data.count) bytes")
+            
+            // Try to decode as WidgetNote first
+            if let decoded = try? JSONDecoder().decode([WidgetNote].self, from: data) {
+                notes = decoded
+                print("✅ Widget: NextNoteIntent decoded \(decoded.count) WidgetNote objects")
+            } else {
+                print("⚠️ Widget: NextNoteIntent failed to decode as WidgetNote, trying Note...")
+                
+                // Try to decode as MainAppNote (from main app) and convert
+                if let mainAppNotes = try? JSONDecoder().decode([MainAppNote].self, from: data) {
+                    print("✅ Widget: NextNoteIntent decoded \(mainAppNotes.count) MainAppNote objects from main app")
+                    // Convert MainAppNote to WidgetNote
+                    notes = mainAppNotes.map { note in
+                        WidgetNote(
+                            id: note.id,
+                            text: note.text,
+                            date: note.date,
+                            lastModified: note.lastModified
+                        )
+                    }
+                    print("✅ Widget: NextNoteIntent converted to \(notes.count) WidgetNote objects")
+                } else {
+                    print("❌ Widget: NextNoteIntent failed to decode as MainAppNote either")
+                    notes = []
+                }
+            }
         } else {
+            print("❌ Widget: NextNoteIntent no data found for key: \(notesKey)")
             notes = []
         }
-        guard !notes.isEmpty else { return .result() }
+        
+        guard !notes.isEmpty else { 
+            print("❌ Widget: NextNoteIntent no notes available")
+            return .result() 
+        }
+        
         var idx = ud.integer(forKey: indexKey)
+        print("📊 Widget: NextNoteIntent current index: \(idx), notes count: \(notes.count)")
+        
         idx = (idx + 1) % notes.count
         ud.set(idx, forKey: indexKey)
+        print("✅ Widget: NextNoteIntent updated index to: \(idx)")
+        
         WidgetCenter.shared.reloadAllTimelines()
+        print("✅ Widget: NextNoteIntent reloaded widget timelines")
+        
         return .result()
     }
 }
@@ -44,7 +158,7 @@ struct NextNoteIntent: AppIntent {
 // MARK: - Timeline Provider
 struct NotesProvider: TimelineProvider {
     func placeholder(in context: Context) -> NotesEntry {
-        NotesEntry(date: Date(), note: Note(id: UUID(), text: "Sample note", date: Date(), lastModified: Date()))
+        NotesEntry(date: Date(), note: WidgetNote(id: UUID(), text: "Sample note", date: Date(), lastModified: Date()))
     }
     func getSnapshot(in context: Context, completion: @escaping (NotesEntry) -> Void) {
         let entry = loadEntry()
@@ -56,24 +170,62 @@ struct NotesProvider: TimelineProvider {
         completion(timeline)
     }
     private func loadEntry() -> NotesEntry {
+        print("🔍 Widget: Starting loadEntry()")
+        
         guard let ud = UserDefaults(suiteName: appGroupID) else {
-            return NotesEntry(date: Date(), note: Note(id: UUID(), text: "No notes", date: Date(), lastModified: Date()))
+            print("❌ Widget: Failed to access UserDefaults with appGroupID: \(appGroupID)")
+            return NotesEntry(date: Date(), note: WidgetNote(id: UUID(), text: "❌ No UserDefaults access", date: Date(), lastModified: Date()))
         }
-        let notes: [Note]
-        if let data = ud.data(forKey: notesKey), let decoded = try? JSONDecoder().decode([Note].self, from: data) {
-            notes = decoded
+        
+        print("✅ Widget: UserDefaults accessed successfully")
+        
+        let notes: [WidgetNote]
+        if let data = ud.data(forKey: notesKey) {
+            print("📊 Widget: Found data, size: \(data.count) bytes")
+            
+            // Try to decode as WidgetNote first
+            if let decoded = try? JSONDecoder().decode([WidgetNote].self, from: data) {
+                notes = decoded
+                print("✅ Widget: Successfully decoded \(decoded.count) WidgetNote objects")
+            } else {
+                print("⚠️ Widget: Failed to decode as WidgetNote, trying Note...")
+                
+                // Try to decode as MainAppNote (from main app) and convert
+                if let mainAppNotes = try? JSONDecoder().decode([MainAppNote].self, from: data) {
+                    print("✅ Widget: Successfully decoded \(mainAppNotes.count) MainAppNote objects from main app")
+                    // Convert MainAppNote to WidgetNote
+                    notes = mainAppNotes.map { note in
+                        WidgetNote(
+                            id: note.id,
+                            text: note.text,
+                            date: note.date,
+                            lastModified: note.lastModified
+                        )
+                    }
+                    print("✅ Widget: Converted to \(notes.count) WidgetNote objects")
+                } else {
+                    print("❌ Widget: Failed to decode as MainAppNote either")
+                    notes = []
+                }
+            }
         } else {
+            print("❌ Widget: No data found for key: \(notesKey)")
             notes = []
         }
+        
         let idx = ud.integer(forKey: indexKey)
-        let note = (!notes.isEmpty && idx < notes.count) ? notes[idx] : Note(id: UUID(), text: "No notes", date: Date(), lastModified: Date())
+        print("📊 Widget: Current index: \(idx), Notes count: \(notes.count)")
+        
+        let note = (!notes.isEmpty && idx < notes.count) ? notes[idx] : WidgetNote(id: UUID(), text: "No notes available", date: Date(), lastModified: Date())
+        print("📝 Widget: Selected note text: '\(note.text)'")
+        
         return NotesEntry(date: Date(), note: note)
     }
 }
 
 struct NotesEntry: TimelineEntry {
     let date: Date
-    let note: Note
+    let note: WidgetNote
 }
 
 // MARK: - Widget
@@ -81,18 +233,33 @@ struct NotesToSelfWidgetEntryView: View {
     var entry: NotesEntry
     @Environment(\.widgetFamily) var widgetFamily
     
+    private var currentDateTimeString: String {
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "GMT+1")
+        formatter.dateFormat = "M/d — HH:mm"
+        return formatter.string(from: Date())
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 // Text content
-                Text(entry.note.text)
-                    .foregroundColor(AppColors.widgetText)
-                    .font(widgetFamily == .systemSmall ? AppTypography.widgetSmallFont : AppTypography.widgetLargeFont)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                    .padding(AppPadding.widgetTextPadding)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(entry.note.text)
+                        .foregroundColor(AppColors.widgetText)
+                        .font(widgetFamily == .systemSmall ? AppTypography.widgetSmallFont : AppTypography.widgetLargeFont)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                    
+                    // Debug info
+                    Text("Debug: \(entry.note.text.prefix(20))...")
+                        .font(.caption2)
+                        .foregroundColor(AppColors.widgetText.opacity(0.7))
+                        .lineLimit(1)
+                }
+                .padding(AppPadding.widgetTextPadding)
                 
                 // Button absolutely positioned at bottom-right corner
                 ZStack {
@@ -105,8 +272,21 @@ struct NotesToSelfWidgetEntryView: View {
                     Circle()
                         .fill(AppColors.widgetButtonVisible)
                         .frame(width: AppDimensions.widgetButtonVisibleSize, height: AppDimensions.widgetButtonVisibleSize)
+                        .overlay(
+                            Circle()
+                                .stroke(AppColors.widgetButtonBorder, lineWidth: 1)
+                        )
                 }
                 .position(x: geometry.size.width, y: geometry.size.height)
+                
+                // Date/time text at bottom
+                VStack {
+                    Spacer()
+                    Text(currentDateTimeString)
+                        .font(AppTypography.widgetDateTimeFont)
+                        .foregroundColor(AppColors.widgetText)
+                        .padding(.bottom, 4)
+                }
             }
         }
         .containerBackground(AppColors.widgetBackground, for: .widget)
@@ -115,7 +295,7 @@ struct NotesToSelfWidgetEntryView: View {
 
 struct NotesToSelfWidgetEntryView_Previews: PreviewProvider {
     static var previews: some View {
-        NotesToSelfWidgetEntryView(entry: NotesEntry(date: .now, note: Note(id: UUID(), text: "Preview note", date: .now, lastModified: .now)))
+        NotesToSelfWidgetEntryView(entry: NotesEntry(date: .now, note: WidgetNote(id: UUID(), text: "Preview note", date: .now, lastModified: .now)))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }
