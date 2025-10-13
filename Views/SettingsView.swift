@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UniformTypeIdentifiers
 
 // 📗 Settings Screen: Configuration screen for app preferences
 struct SettingsView: View {
@@ -14,7 +13,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var notificationsPerWeek: Double = 2
     @State private var notificationsEnabled: Bool = true
-    @State private var showingDocumentPicker = false
+    @State private var showingImportView = false
     @State private var showingShareSheet = false
     @State private var exportURL: URL?
     
@@ -42,7 +41,7 @@ struct SettingsView: View {
                     .disabled(store.notes.isEmpty)
                     
                     Button("Import Notes") {
-                        showingDocumentPicker = true
+                        showingImportView = true
                     }
                 }
                 
@@ -64,16 +63,9 @@ struct SettingsView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingDocumentPicker) {
-                DocumentPicker { url in
-                    do {
-                        let data = try Data(contentsOf: url)
-                        store.importNotes(from: data)
-                    } catch {
-                        store.importExportMessage = "Failed to read file: \(error.localizedDescription)"
-                        store.showImportExportAlert = true
-                    }
-                }
+            .sheet(isPresented: $showingImportView) {
+                ImportNotesView()
+                    .environmentObject(store)
             }
             .sheet(isPresented: $showingShareSheet) {
                 if let url = exportURL {
@@ -89,35 +81,6 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Document Picker
-struct DocumentPicker: UIViewControllerRepresentable {
-    let onDocumentPicked: (URL) -> Void
-    
-    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.json])
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UIDocumentPickerDelegate {
-        let parent: DocumentPicker
-        
-        init(_ parent: DocumentPicker) {
-            self.parent = parent
-        }
-        
-        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-            guard let url = urls.first else { return }
-            parent.onDocumentPicked(url)
-        }
-    }
-}
 
 // MARK: - Share Sheet
 struct ShareSheet: UIViewControllerRepresentable {
