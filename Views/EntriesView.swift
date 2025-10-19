@@ -7,84 +7,35 @@
 
 import SwiftUI
 
-// 📗 Entries View: Main notes interface (formerly ContentView content)
+// 📗 Entries View: List-based entries interface with sheet editing
 struct EntriesView: View {
     @EnvironmentObject var store: NotesStore
-    @FocusState private var isInputFocused: Bool
+    @State private var selectedNote: Note?
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Input section
-                HStack {
-                    ExpandingTextView(
-                        text: $store.newNote, 
-                        placeholder: "What's on your mind?",
-                        onSubmit: {
-                            if store.isEditing {
-                                store.updateNote()
-                            } else {
-                                store.addNote()
-                            }
-                        }
-                    )
-                    .focused($isInputFocused)
-                        .frame(minHeight: 44)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(AppColors.inputBackground)
-                        .cornerRadius(22)
-                    
-                    Button(action: {
-                        if store.isEditing {
-                            store.updateNote()
-                        } else {
-                            store.addNote()
-                        }
-                    }) {
-                        Image(systemName: store.isEditing ? "checkmark.circle.fill" : "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(AppColors.accent)
-                    }
-                    .disabled(store.newNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-                .padding()
-                .background(AppColors.background)
-                
-                // Notes list
+            Group {
                 if store.notes.isEmpty {
-                    Spacer()
-                    VStack(spacing: 16) {
+                    // Empty state
+                    VStack(spacing: 20) {
                         Image(systemName: "note.text")
-                            .font(.system(size: 48))
+                            .font(.system(size: 64))
                             .foregroundColor(AppColors.secondaryText)
-                        Text("No notes yet")
+                        Text("No entries yet")
                             .font(.title2)
                             .foregroundColor(AppColors.secondaryText)
-                        Text("Add your first note above")
+                        Text("Tap the + button to create your first entry")
                             .font(.body)
                             .foregroundColor(AppColors.tertiaryText)
                     }
-                    Spacer()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    List {
-                        ForEach(store.notes) { note in
-                            NoteItemView(note: note)
-                                .onTapGesture {
-                                    // Check if keyboard was open before dismissing
-                                    let wasKeyboardOpen = isInputFocused
-                                    
-                                    // Dismiss keyboard
-                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                    isInputFocused = false
-                                    
-                                    // Only start editing if keyboard wasn't open
-                                    if !wasKeyboardOpen {
-                                        store.startEditing(note: note)
-                                    }
-                                }
-                        }
-                        .onDelete(perform: store.delete)
+                    // List of entries
+                    List(store.notes) { note in
+                        EntriesRowView(note: note)
+                            .onTapGesture {
+                                selectedNote = note
+                            }
                     }
                     .listStyle(PlainListStyle())
                     .background(AppColors.listBackground)
@@ -93,12 +44,25 @@ struct EntriesView: View {
             .background(AppColors.background)
             .navigationTitle("Entries")
             .navigationBarTitleDisplayMode(.large)
-            .onTapGesture {
-                // Dismiss keyboard when tapping outside input area
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                isInputFocused = false
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: createNewEntry) {
+                        Image(systemName: "plus")
+                            .foregroundColor(AppColors.accent)
+                    }
+                }
+            }
+            .sheet(item: $selectedNote) { note in
+                EntriesEditView(note: note)
+                    .environmentObject(store)
             }
         }
+    }
+    
+    private func createNewEntry() {
+        // Create a new empty note and open it for editing
+        let newNote = Note(text: "")
+        selectedNote = newNote
     }
 }
 
