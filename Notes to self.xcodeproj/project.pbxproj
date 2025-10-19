@@ -10,7 +10,6 @@
 		BE407C682DFE5D680048CE1A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE407C672DFE5D680048CE1A /* WidgetKit.framework */; };
 		BE407C6A2DFE5D680048CE1A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE407C692DFE5D680048CE1A /* SwiftUI.framework */; };
 		BE407C772DFE5D6A0048CE1A /* NotesToSelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BE407C652DFE5D680048CE1A /* NotesToSelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		BE6EC8612E8B7F9F004D9E63 /* ImportNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EC8602E8B7F9F004D9E63 /* ImportNotesView.swift */; };
 		BE6EC8622E8B7F9F004D9E63 /* ImportNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EC8602E8B7F9F004D9E63 /* ImportNotesView.swift */; };
 		BEA9AE742E04FE1D00F3F867 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE712E04FE1D00F3F867 /* ContentView.swift */; };
 		BEA9AE752E04FE1D00F3F867 /* ExpandingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6E2E04FE1D00F3F867 /* ExpandingTextView.swift */; };
@@ -18,12 +17,10 @@
 		BEA9AE772E04FE1D00F3F867 /* NoteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6F2E04FE1D00F3F867 /* NoteItemView.swift */; };
 		BEA9AE782E04FE1D00F3F867 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6A2E04FE1D00F3F867 /* Note.swift */; };
 		BEA9AE792E04FE1D00F3F867 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE722E04FE1D00F3F867 /* SettingsView.swift */; };
-		BEA9AE7A2E04FE1D00F3F867 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE712E04FE1D00F3F867 /* ContentView.swift */; };
 		BEA9AE7B2E04FE1D00F3F867 /* ExpandingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6E2E04FE1D00F3F867 /* ExpandingTextView.swift */; };
 		BEA9AE7C2E04FE1D00F3F867 /* NotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6C2E04FE1D00F3F867 /* NotesStore.swift */; };
 		BEA9AE7D2E04FE1D00F3F867 /* NoteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6F2E04FE1D00F3F867 /* NoteItemView.swift */; };
 		BEA9AE7E2E04FE1D00F3F867 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6A2E04FE1D00F3F867 /* Note.swift */; };
-		BEA9AE7F2E04FE1D00F3F867 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE722E04FE1D00F3F867 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -312,13 +309,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEA9AE7A2E04FE1D00F3F867 /* ContentView.swift in Sources */,
 				BEA9AE7B2E04FE1D00F3F867 /* ExpandingTextView.swift in Sources */,
 				BEA9AE7C2E04FE1D00F3F867 /* NotesStore.swift in Sources */,
 				BEA9AE7D2E04FE1D00F3F867 /* NoteItemView.swift in Sources */,
 				BEA9AE7E2E04FE1D00F3F867 /* Note.swift in Sources */,
-				BEA9AE7F2E04FE1D00F3F867 /* SettingsView.swift in Sources */,
-				BE6EC8612E8B7F9F004D9E63 /* ImportNotesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
