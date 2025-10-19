@@ -8,6 +8,9 @@ class NotesStore: ObservableObject {
     @Published var notes: [Note] = [] {
         didSet { save() }
     }
+    @Published var people: [Note] = [] {
+        didSet { savePeople() }
+    }
     @Published var newNote: String = ""
     @Published var currentIndex: Int = 0 { didSet { save() } }
     @Published var showNotificationAlert = false
@@ -17,10 +20,12 @@ class NotesStore: ObservableObject {
     
     private let appGroupID = "group.co.uk.cursive.NotesToSelf"
     private let notesKey = "notes"
+    private let peopleKey = "people"
     private let indexKey = "currentIndex"
     
     init() {
         load()
+        loadPeople()
     }
     
     func addNote() {
@@ -162,6 +167,21 @@ class NotesStore: ObservableObject {
         currentIndex = ud.integer(forKey: indexKey)
         print("Current index: \(currentIndex)")
         print("=== END DEBUGGING ===")
+    }
+    
+    private func savePeople() {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        if let data = try? JSONEncoder().encode(people) {
+            ud.set(data, forKey: peopleKey)
+        }
+    }
+    
+    private func loadPeople() {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        if let data = ud.data(forKey: peopleKey),
+           let decoded = try? JSONDecoder().decode([Note].self, from: data) {
+            people = decoded
+        }
     }
     
     // MARK: - Import/Export Functions
