@@ -106,3 +106,4 @@ struct EntriesView: View {
     EntriesView()
         .environmentObject(NotesStore())
 }
+
