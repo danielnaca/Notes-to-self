@@ -32,10 +32,12 @@ struct ExpandingTextView: View {
             TextEditor(text: $text)
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
+                .foregroundColor(AppColors.noteText) // Explicit black text color
                 .frame(minHeight: textHeight, maxHeight: textHeight)
                 .onAppear {
                     // Remove the default background and configure
                     UITextView.appearance().backgroundColor = .clear
+                    UITextView.appearance().textColor = UIColor(AppColors.noteText)
                     updateHeight(for: text)
                 }
                 .onChange(of: text) { _, newValue in
