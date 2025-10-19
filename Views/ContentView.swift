@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var store: NotesStore
     @State private var showingSettings = false
+    @FocusState private var isInputFocused: Bool
     
     var body: some View {
         NavigationView {
@@ -21,6 +22,7 @@ struct ContentView: View {
                             }
                         }
                     )
+                    .focused($isInputFocused)
                         .frame(minHeight: 44)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -63,7 +65,17 @@ struct ContentView: View {
                         ForEach(store.notes) { note in
                             NoteItemView(note: note)
                                 .onTapGesture {
-                                    store.startEditing(note: note)
+                                    // Check if keyboard was open before dismissing
+                                    let wasKeyboardOpen = isInputFocused
+                                    
+                                    // Dismiss keyboard
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    isInputFocused = false
+                                    
+                                    // Only start editing if keyboard wasn't open
+                                    if !wasKeyboardOpen {
+                                        store.startEditing(note: note)
+                                    }
                                 }
                         }
                         .onDelete(perform: store.delete)
@@ -85,6 +97,11 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .onTapGesture {
+                // Dismiss keyboard when tapping outside input area
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                isInputFocused = false
             }
         }
     }
