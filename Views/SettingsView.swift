@@ -14,8 +14,8 @@ struct SettingsView: View {
     @State private var notificationsPerWeek: Double = 2
     @State private var notificationsEnabled: Bool = true
     @State private var showingImportView = false
-    @State private var showingShareSheet = false
-    @State private var exportURL: URL?
+    @State private var showCopyAlert = false
+    @State private var copyAlertMessage = ""
     
     var body: some View {
         NavigationView {
@@ -31,15 +31,19 @@ struct SettingsView: View {
                     }
                 }
                 
-                Section("Data Management") {
-                    Button("Export Notes") {
-                        if let url = store.exportNotes() {
-                            exportURL = url
-                            showingShareSheet = true
-                        }
+                Section("Copy Data") {
+                    Button("Entries Data") {
+                        copyEntriesToClipboard()
                     }
                     .disabled(store.notes.isEmpty)
                     
+                    Button("People Data") {
+                        copyPeopleToClipboard()
+                    }
+                    .disabled(store.people.isEmpty)
+                }
+                
+                Section("Data Management") {
                     Button("Import Notes") {
                         showingImportView = true
                     }
@@ -50,6 +54,13 @@ struct SettingsView: View {
                         Text("Total Notes")
                         Spacer()
                         Text("\(store.notes.count)")
+                            .foregroundColor(AppColors.secondaryText)
+                    }
+                    
+                    HStack {
+                        Text("Total People")
+                        Spacer()
+                        Text("\(store.people.count)")
                             .foregroundColor(AppColors.secondaryText)
                     }
                 }
@@ -67,10 +78,10 @@ struct SettingsView: View {
                 ImportNotesView()
                     .environmentObject(store)
             }
-            .sheet(isPresented: $showingShareSheet) {
-                if let url = exportURL {
-                    ShareSheet(items: [url])
-                }
+            .alert("Copied", isPresented: $showCopyAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(copyAlertMessage)
             }
             .alert("Import/Export", isPresented: $store.showImportExportAlert) {
                 Button("OK", role: .cancel) {}
@@ -78,6 +89,40 @@ struct SettingsView: View {
                 Text(store.importExportMessage)
             }
         }
+    }
+    
+    // MARK: - Copy Functions
+    
+    private func copyEntriesToClipboard() {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        
+        guard let data = try? encoder.encode(store.notes),
+              let jsonString = String(data: data, encoding: .utf8) else {
+            copyAlertMessage = "Failed to copy entries data"
+            showCopyAlert = true
+            return
+        }
+        
+        UIPasteboard.general.string = jsonString
+        copyAlertMessage = "Copied \(store.notes.count) entries to clipboard"
+        showCopyAlert = true
+    }
+    
+    private func copyPeopleToClipboard() {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        
+        guard let data = try? encoder.encode(store.people),
+              let jsonString = String(data: data, encoding: .utf8) else {
+            copyAlertMessage = "Failed to copy people data"
+            showCopyAlert = true
+            return
+        }
+        
+        UIPasteboard.general.string = jsonString
+        copyAlertMessage = "Copied \(store.people.count) people to clipboard"
+        showCopyAlert = true
     }
 }
 

@@ -26,6 +26,7 @@
 		BEA9AE7C2E04FE1D00F3F867 /* NotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6C2E04FE1D00F3F867 /* NotesStore.swift */; };
 		BEA9AE7D2E04FE1D00F3F867 /* NoteItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6F2E04FE1D00F3F867 /* NoteItemView.swift */; };
 		BEA9AE7E2E04FE1D00F3F867 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6A2E04FE1D00F3F867 /* Note.swift */; };
+		BEFF0A592EB271390051BC70 /* PeopleEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEFF0A582EB271390051BC70 /* PeopleEditView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 		BEA9AE6F2E04FE1D00F3F867 /* NoteItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteItemView.swift; sourceTree = "<group>"; };
 		BEA9AE712E04FE1D00F3F867 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BEA9AE722E04FE1D00F3F867 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BEFF0A582EB271390051BC70 /* PeopleEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleEditView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -189,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				BE45BE7E2EAFDF07006AF91C /* EntriesEditView.swift */,
+				BEFF0A582EB271390051BC70 /* PeopleEditView.swift */,
 				BE00D7F12EA57680000203BD /* AlarmsView.swift */,
 				BE00D7F22EA57680000203BD /* EntriesView.swift */,
 				BE00D7F32EA57680000203BD /* PeopleView.swift */,
@@ -320,6 +323,7 @@
 				BEA9AE772E04FE1D00F3F867 /* NoteItemView.swift in Sources */,
 				BEA9AE782E04FE1D00F3F867 /* Note.swift in Sources */,
 				BE45BE7F2EAFDF07006AF91C /* EntriesEditView.swift in Sources */,
+				BEFF0A592EB271390051BC70 /* PeopleEditView.swift in Sources */,
 				BEA9AE792E04FE1D00F3F867 /* SettingsView.swift in Sources */,
 				BE6EC8622E8B7F9F004D9E63 /* ImportNotesView.swift in Sources */,
 			);
