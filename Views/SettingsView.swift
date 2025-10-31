@@ -20,6 +20,19 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
+                Section("UI Vocabulary") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Input Bar: Bottom text field area with send button")
+                            .font(.caption)
+                        Text("Message Bubble: Individual entry in the list")
+                            .font(.caption)
+                        Text("Messages Area: Scrollable section showing all entries")
+                            .font(.caption)
+                    }
+                    .foregroundColor(AppColors.secondaryText)
+                    .padding(.vertical, 4)
+                }
+                
                 Section("Notifications") {
                     Toggle("Enable Notifications", isOn: $notificationsEnabled)
                     
