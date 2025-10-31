@@ -10,27 +10,34 @@ import SwiftUI
 // 📗 Import Notes View: Paste-based JSON import interface
 struct ImportNotesView: View {
     @EnvironmentObject var store: NotesStore
+    @EnvironmentObject var cbtStore: CBTStore
     @Environment(\.dismiss) private var dismiss
     @State private var pastedJSON: String = ""
     @State private var isImporting = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var showConfirmation = false
+    @State private var validatedData: CompleteAppData?
     
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 20) {
                 // Instructions
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Paste Your Notes JSON")
+                    Text("Paste Your Data")
                         .font(.headline)
                         .foregroundColor(AppColors.noteText)
                     
-                    Text("Copy and paste the JSON content from your exported notes file below:")
+                    Text("Copy and paste the JSON content from your exported data below:")
                         .font(.body)
                         .foregroundColor(AppColors.secondaryText)
                     
-                    Text("• Export format from Notes to Self")
+                    Text("⚠️ Warning: This will overwrite all existing data")
                         .font(.caption)
-                        .foregroundColor(AppColors.tertiaryText)
-                    Text("• Raw JSON text content")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.red)
+                    
+                    Text("Make sure you've exported your current data first")
                         .font(.caption)
                         .foregroundColor(AppColors.tertiaryText)
                 }
@@ -77,14 +84,14 @@ struct ImportNotesView: View {
                     
                     Spacer()
                     
-                    Button(action: importNotes) {
+                    Button(action: importAllData) {
                         HStack {
                             if isImporting {
                                 ProgressView()
                                     .scaleEffect(0.8)
                                     .tint(.white)
                             }
-                            Text(isImporting ? "Importing..." : "Import Notes")
+                            Text(isImporting ? "Importing..." : "Import Data")
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -94,7 +101,7 @@ struct ImportNotesView: View {
                 .padding()
             }
             .background(AppColors.background)
-            .navigationTitle("Import Notes")
+            .navigationTitle("Import Data")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -103,14 +110,34 @@ struct ImportNotesView: View {
                     }
                 }
             }
+            .alert("Import Status", isPresented: $showAlert) {
+                Button("OK", role: .cancel) {
+                    if alertMessage.contains("success") {
+                        dismiss()
+                    }
+                }
+            } message: {
+                Text(alertMessage)
+            }
+            .alert("Confirm Import", isPresented: $showConfirmation) {
+                Button("Cancel", role: .cancel) {
+                    validatedData = nil
+                }
+                Button("Import & Overwrite", role: .destructive) {
+                    performImport()
+                }
+            } message: {
+                if let data = validatedData {
+                    Text("This will overwrite all existing data with:\n\n\(data.entries.count) entries\n\(data.people.count) people\n\(data.cbtEntries.count) CBT entries\n\nExported on: \(formatDate(data.exportDate))")
+                }
+            }
         }
     }
     
-    private func importNotes() {
+    private func importAllData() {
         isImporting = true
         
-        // Add a small delay to show the loading state
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let trimmedJSON = pastedJSON.trimmingCharacters(in: .whitespacesAndNewlines)
             
             guard !trimmedJSON.isEmpty else {
@@ -119,26 +146,59 @@ struct ImportNotesView: View {
             }
             
             guard let data = trimmedJSON.data(using: .utf8) else {
-                store.importExportMessage = "Invalid text format. Please ensure you've pasted valid JSON content."
-                store.showImportExportAlert = true
+                alertMessage = "Invalid text format. Please ensure you've pasted valid JSON content."
+                showAlert = true
                 isImporting = false
                 return
             }
             
-            // Use the existing import function
-            store.importNotes(from: data)
-            isImporting = false
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
             
-            // Close the import view after successful import
-            if !store.showImportExportAlert || store.importExportMessage.contains("completed successfully") {
-                dismiss()
+            do {
+                // Step 1: Validate the JSON by attempting to decode it
+                let completeData = try decoder.decode(CompleteAppData.self, from: data)
+                
+                // Step 2: JSON is valid, store it and show confirmation
+                validatedData = completeData
+                isImporting = false
+                showConfirmation = true
+                
+            } catch {
+                // Step 3: JSON is invalid, show error (no data touched)
+                alertMessage = "Invalid data format: \(error.localizedDescription)\n\nPlease ensure you've copied the complete export from Settings."
+                showAlert = true
+                isImporting = false
+                validatedData = nil
             }
         }
+    }
+    
+    private func performImport() {
+        guard let completeData = validatedData else { return }
+        
+        // Now we actually overwrite the data (only after user confirms)
+        store.notes = completeData.entries
+        store.people = completeData.people
+        cbtStore.entries = completeData.cbtEntries
+        
+        let totalItems = completeData.entries.count + completeData.people.count + completeData.cbtEntries.count
+        alertMessage = "Successfully imported \(totalItems) items:\n• \(completeData.entries.count) entries\n• \(completeData.people.count) people\n• \(completeData.cbtEntries.count) CBT entries"
+        showAlert = true
+        validatedData = nil
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }
 
 #Preview {
     ImportNotesView()
         .environmentObject(NotesStore())
+        .environmentObject(CBTStore())
 }
 

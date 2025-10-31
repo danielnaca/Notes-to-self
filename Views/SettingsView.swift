@@ -7,6 +7,21 @@
 
 import SwiftUI
 
+// 📗 Complete App Data: Contains all data for export/import
+struct CompleteAppData: Codable {
+    let entries: [Note]
+    let people: [Note]
+    let cbtEntries: [CBTEntry]
+    let exportDate: Date
+    
+    init(entries: [Note], people: [Note], cbtEntries: [CBTEntry]) {
+        self.entries = entries
+        self.people = people
+        self.cbtEntries = cbtEntries
+        self.exportDate = Date()
+    }
+}
+
 // 📗 Settings Screen: Configuration screen for app preferences
 struct SettingsView: View {
     @EnvironmentObject var store: NotesStore
@@ -17,6 +32,8 @@ struct SettingsView: View {
     @State private var showCopyAlert = false
     @State private var copyAlertMessage = ""
     @State private var showDeleteCBTAlert = false
+    @State private var showImportAlert = false
+    @State private var importAlertMessage = ""
     
     var body: some View {
         NavigationView {
@@ -45,20 +62,13 @@ struct SettingsView: View {
                     }
                 }
                 
-                Section("Copy Data") {
-                    Button("Entries Data") {
-                        copyEntriesToClipboard()
-                    }
-                    .disabled(store.notes.isEmpty)
-                    
-                    Button("People Data") {
-                        copyPeopleToClipboard()
-                    }
-                    .disabled(store.people.isEmpty)
-                }
-                
                 Section("Data Management") {
-                    Button("Import Notes") {
+                    Button("Export All Data") {
+                        exportAllData()
+                    }
+                    .disabled(store.notes.isEmpty && store.people.isEmpty && cbtStore.entries.isEmpty)
+                    
+                    Button("Import All Data") {
                         showingImportView = true
                     }
                     
@@ -97,6 +107,7 @@ struct SettingsView: View {
             .sheet(isPresented: $showingImportView) {
                 ImportNotesView()
                     .environmentObject(store)
+                    .environmentObject(cbtStore)
             }
             .alert("Copied", isPresented: $showCopyAlert) {
                 Button("OK", role: .cancel) {}
@@ -116,40 +127,38 @@ struct SettingsView: View {
             } message: {
                 Text("This will permanently delete all \(cbtStore.entries.count) CBT entries. This action cannot be undone.")
             }
+            .alert("Import Status", isPresented: $showImportAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(importAlertMessage)
+            }
         }
     }
     
-    // MARK: - Copy Functions
+    // MARK: - Export/Import Functions
     
-    private func copyEntriesToClipboard() {
+    private func exportAllData() {
+        let completeData = CompleteAppData(
+            entries: store.notes,
+            people: store.people,
+            cbtEntries: cbtStore.entries
+        )
+        
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
         
-        guard let data = try? encoder.encode(store.notes),
+        guard let data = try? encoder.encode(completeData),
               let jsonString = String(data: data, encoding: .utf8) else {
-            copyAlertMessage = "Failed to copy entries data"
+            copyAlertMessage = "Failed to export data"
             showCopyAlert = true
             return
         }
         
         UIPasteboard.general.string = jsonString
-        copyAlertMessage = "Copied \(store.notes.count) entries to clipboard"
-        showCopyAlert = true
-    }
-    
-    private func copyPeopleToClipboard() {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         
-        guard let data = try? encoder.encode(store.people),
-              let jsonString = String(data: data, encoding: .utf8) else {
-            copyAlertMessage = "Failed to copy people data"
-            showCopyAlert = true
-            return
-        }
-        
-        UIPasteboard.general.string = jsonString
-        copyAlertMessage = "Copied \(store.people.count) people to clipboard"
+        let totalItems = store.notes.count + store.people.count + cbtStore.entries.count
+        copyAlertMessage = "Exported \(totalItems) items (\(store.notes.count) entries, \(store.people.count) people, \(cbtStore.entries.count) CBT) to clipboard"
         showCopyAlert = true
     }
 }
