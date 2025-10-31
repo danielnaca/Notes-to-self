@@ -70,23 +70,15 @@ struct PeopleRowView: View {
     }
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(AppColors.noteText)
-                    .lineLimit(1)
-                
-                Text(DateFormatter.peopleFormatter.string(from: note.date))
-                    .font(.caption)
-                    .foregroundColor(AppColors.secondaryText)
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(AppColors.noteText)
+                .lineLimit(1)
             
-            Spacer()
-            
-            Image(systemName: "chevron.right")
+            Text(DateFormatter.peopleFormatter.string(from: note.date))
                 .font(.caption)
-                .foregroundColor(AppColors.tertiaryText)
+                .foregroundColor(AppColors.secondaryText)
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())

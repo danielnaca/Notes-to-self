@@ -19,22 +19,16 @@ struct EntriesRowView: View {
     }
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(preview)
-                    .font(.body)
-                    .foregroundColor(AppColors.noteText)
-                    .lineLimit(3)
-                    .multilineTextAlignment(.leading)
-                
-                Text(DateFormatter.entriesFormatter.string(from: note.date))
-                    .font(.caption)
-                    .foregroundColor(AppColors.secondaryText)
-            }
-            Spacer()
-            Image(systemName: "chevron.right")
+        VStack(alignment: .leading, spacing: 4) {
+            Text(preview)
+                .font(.body)
+                .foregroundColor(AppColors.noteText)
+                .lineLimit(3)
+                .multilineTextAlignment(.leading)
+            
+            Text(DateFormatter.entriesFormatter.string(from: note.date))
                 .font(.caption)
-                .foregroundColor(AppColors.tertiaryText)
+                .foregroundColor(AppColors.secondaryText)
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
