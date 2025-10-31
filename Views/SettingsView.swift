@@ -10,12 +10,13 @@ import SwiftUI
 // 📗 Settings Screen: Configuration screen for app preferences
 struct SettingsView: View {
     @EnvironmentObject var store: NotesStore
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var cbtStore: CBTStore
     @State private var notificationsPerWeek: Double = 2
     @State private var notificationsEnabled: Bool = true
     @State private var showingImportView = false
     @State private var showCopyAlert = false
     @State private var copyAlertMessage = ""
+    @State private var showDeleteCBTAlert = false
     
     var body: some View {
         NavigationView {
@@ -60,6 +61,12 @@ struct SettingsView: View {
                     Button("Import Notes") {
                         showingImportView = true
                     }
+                    
+                    Button("Delete All CBT Entries") {
+                        showDeleteCBTAlert = true
+                    }
+                    .foregroundColor(.red)
+                    .disabled(cbtStore.entries.isEmpty)
                 }
                 
                 Section("Statistics") {
@@ -76,17 +83,17 @@ struct SettingsView: View {
                         Text("\(store.people.count)")
                             .foregroundColor(AppColors.secondaryText)
                     }
-                }
-            }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
+                    
+                    HStack {
+                        Text("Total CBT Entries")
+                        Spacer()
+                        Text("\(cbtStore.entries.count)")
+                            .foregroundColor(AppColors.secondaryText)
                     }
                 }
             }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showingImportView) {
                 ImportNotesView()
                     .environmentObject(store)
@@ -100,6 +107,14 @@ struct SettingsView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(store.importExportMessage)
+            }
+            .alert("Delete All CBT Entries?", isPresented: $showDeleteCBTAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete All", role: .destructive) {
+                    cbtStore.deleteAllEntries()
+                }
+            } message: {
+                Text("This will permanently delete all \(cbtStore.entries.count) CBT entries. This action cannot be undone.")
             }
         }
     }
@@ -154,4 +169,5 @@ struct ShareSheet: UIViewControllerRepresentable {
 #Preview {
     SettingsView()
         .environmentObject(NotesStore())
+        .environmentObject(CBTStore())
 } 

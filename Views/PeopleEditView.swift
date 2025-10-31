@@ -30,12 +30,8 @@ struct PeopleEditView: View {
                     .padding(.top)
             }
             
-            // Text editor
-            TextEditor(text: $editedText)
-                .font(.body)
-                .foregroundColor(AppColors.noteText)
-                .scrollContentBackground(.hidden)
-                .background(AppColors.inputBackground)
+            // Text editor with styled text
+            StyledTextEditor(text: $editedText)
                 .padding(.horizontal)
             
             Spacer()
@@ -77,6 +73,78 @@ struct PeopleEditView: View {
                 lastModified: Date()
             )
             store.people.insert(newNote, at: 0)
+        }
+    }
+}
+
+// 📗 Styled Text Editor: First line bold, rest regular
+struct StyledTextEditor: UIViewRepresentable {
+    @Binding var text: String
+    
+    func makeUIView(context: Context) -> UITextView {
+        let textView = UITextView()
+        textView.delegate = context.coordinator
+        textView.font = UIFont.systemFont(ofSize: 17)
+        textView.backgroundColor = .white
+        textView.textColor = UIColor(AppColors.noteText)
+        return textView
+    }
+    
+    func updateUIView(_ uiView: UITextView, context: Context) {
+        if uiView.text != text {
+            let selectedRange = uiView.selectedTextRange
+            uiView.attributedText = styledAttributedString(from: text)
+            if let range = selectedRange {
+                uiView.selectedTextRange = range
+            }
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    private func styledAttributedString(from text: String) -> NSAttributedString {
+        let lines = text.components(separatedBy: "\n")
+        let attributedString = NSMutableAttributedString()
+        
+        for (index, line) in lines.enumerated() {
+            let lineText = index < lines.count - 1 ? line + "\n" : line
+            
+            if index == 0 {
+                // First line: bold
+                let attrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.boldSystemFont(ofSize: 17),
+                    .foregroundColor: UIColor(AppColors.noteText)
+                ]
+                attributedString.append(NSAttributedString(string: lineText, attributes: attrs))
+            } else {
+                // Rest: regular
+                let attrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.systemFont(ofSize: 17),
+                    .foregroundColor: UIColor(AppColors.noteText)
+                ]
+                attributedString.append(NSAttributedString(string: lineText, attributes: attrs))
+            }
+        }
+        
+        return attributedString
+    }
+    
+    class Coordinator: NSObject, UITextViewDelegate {
+        var parent: StyledTextEditor
+        
+        init(_ parent: StyledTextEditor) {
+            self.parent = parent
+        }
+        
+        func textViewDidChange(_ textView: UITextView) {
+            parent.text = textView.text
+            
+            // Reapply styling
+            let cursorPosition = textView.selectedRange
+            textView.attributedText = parent.styledAttributedString(from: textView.text)
+            textView.selectedRange = cursorPosition
         }
     }
 }

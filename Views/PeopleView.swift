@@ -10,11 +10,26 @@ import SwiftUI
 // 📗 People View: List view of entries with edit functionality
 struct PeopleView: View {
     @EnvironmentObject var store: NotesStore
-    @State private var showingNewPerson = false
     
     var body: some View {
         NavigationView {
-            Group {
+            VStack(spacing: 0) {
+                // New entry button
+                NavigationLink(destination: PeopleEditView(note: Note(text: "")).environmentObject(store)) {
+                    HStack {
+                        Text("New")
+                            .font(.headline)
+                            .foregroundColor(AppColors.accent)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(AppColors.tertiaryText)
+                    }
+                    .padding()
+                    .background(Color.white)
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                // List of entries
                 if store.people.isEmpty {
                     // Empty state
                     VStack(spacing: 20) {
@@ -26,13 +41,13 @@ struct PeopleView: View {
                             .font(.title2)
                             .foregroundColor(AppColors.secondaryText)
                         
-                        Text("Add some entries to see them here")
+                        Text("Tap 'New' above to create your first entry")
                             .font(.body)
                             .foregroundColor(AppColors.tertiaryText)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    // List of entries
                     List(store.people) { note in
                         NavigationLink(destination: PeopleEditView(note: note).environmentObject(store)) {
                             PeopleRowView(note: note)
@@ -45,16 +60,6 @@ struct PeopleView: View {
             .background(AppColors.background)
             .navigationTitle("People")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: PeopleEditView(note: Note(text: "")).environmentObject(store), isActive: $showingNewPerson) {
-                        Button(action: { showingNewPerson = true }) {
-                            Image(systemName: "plus")
-                                .foregroundColor(AppColors.accent)
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -70,18 +75,13 @@ struct PeopleRowView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(AppColors.noteText)
-                .lineLimit(1)
-            
-            Text(DateFormatter.peopleFormatter.string(from: note.date))
-                .font(.caption)
-                .foregroundColor(AppColors.secondaryText)
-        }
-        .padding(.vertical, 8)
-        .contentShape(Rectangle())
+        Text(title)
+            .font(.headline)
+            .foregroundColor(AppColors.noteText)
+            .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
     }
 }
 

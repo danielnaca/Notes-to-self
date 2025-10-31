@@ -16,6 +16,14 @@
 		BE407C772DFE5D6A0048CE1A /* NotesToSelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BE407C652DFE5D680048CE1A /* NotesToSelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BE45BE7F2EAFDF07006AF91C /* EntriesEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE45BE7E2EAFDF07006AF91C /* EntriesEditView.swift */; };
 		BE6EC8622E8B7F9F004D9E63 /* ImportNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6EC8602E8B7F9F004D9E63 /* ImportNotesView.swift */; };
+		BEA25E662EB514EC00D7F339 /* CognitiveDistortion.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25E632EB514E600D7F339 /* CognitiveDistortion.swift */; };
+		BEA25E672EB514EC00D7F339 /* CBTEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25E622EB514E600D7F339 /* CBTEntry.swift */; };
+		BEA25E692EB5150000D7F339 /* CBTStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25E682EB5150000D7F339 /* CBTStore.swift */; };
+		BEA25E6D2EB5151300D7F339 /* CBTEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25E6A2EB5151300D7F339 /* CBTEntryView.swift */; };
+		BEA25E6E2EB5151300D7F339 /* DistortionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25E6C2EB5151300D7F339 /* DistortionPickerView.swift */; };
+		BEA25E6F2EB5151300D7F339 /* CBTListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25E6B2EB5151300D7F339 /* CBTListView.swift */; };
+		BEA25EB12EB54E1B00D7F339 /* CBTCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25EB02EB54E1B00D7F339 /* CBTCalendarView.swift */; };
+		BEA25EB32EB5639C00D7F339 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA25EB22EB5639C00D7F339 /* SearchView.swift */; };
 		BEA9AE742E04FE1D00F3F867 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE712E04FE1D00F3F867 /* ContentView.swift */; };
 		BEA9AE752E04FE1D00F3F867 /* ExpandingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6E2E04FE1D00F3F867 /* ExpandingTextView.swift */; };
 		BEA9AE762E04FE1D00F3F867 /* NotesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA9AE6C2E04FE1D00F3F867 /* NotesStore.swift */; };
@@ -65,6 +73,14 @@
 		BE407C7E2DFE5E8B0048CE1A /* NotesToSelfWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotesToSelfWidgetExtension.entitlements; sourceTree = "<group>"; };
 		BE45BE7E2EAFDF07006AF91C /* EntriesEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntriesEditView.swift; sourceTree = "<group>"; };
 		BE6EC8602E8B7F9F004D9E63 /* ImportNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportNotesView.swift; sourceTree = "<group>"; };
+		BEA25E622EB514E600D7F339 /* CBTEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTEntry.swift; sourceTree = "<group>"; };
+		BEA25E632EB514E600D7F339 /* CognitiveDistortion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CognitiveDistortion.swift; sourceTree = "<group>"; };
+		BEA25E682EB5150000D7F339 /* CBTStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTStore.swift; sourceTree = "<group>"; };
+		BEA25E6A2EB5151300D7F339 /* CBTEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTEntryView.swift; sourceTree = "<group>"; };
+		BEA25E6B2EB5151300D7F339 /* CBTListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTListView.swift; sourceTree = "<group>"; };
+		BEA25E6C2EB5151300D7F339 /* DistortionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistortionPickerView.swift; sourceTree = "<group>"; };
+		BEA25EB02EB54E1B00D7F339 /* CBTCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTCalendarView.swift; sourceTree = "<group>"; };
+		BEA25EB22EB5639C00D7F339 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		BEA9AE6A2E04FE1D00F3F867 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		BEA9AE6C2E04FE1D00F3F867 /* NotesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesStore.swift; sourceTree = "<group>"; };
 		BEA9AE6E2E04FE1D00F3F867 /* ExpandingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandingTextView.swift; sourceTree = "<group>"; };
@@ -141,6 +157,7 @@
 				BEA9AE6B2E04FE1D00F3F867 /* Models */,
 				BEA9AE6D2E04FE1D00F3F867 /* Stores */,
 				BEA9AE732E04FE1D00F3F867 /* Views */,
+				BEA25E512EB514C800D7F339 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -162,9 +179,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		BEA25E512EB514C800D7F339 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		BEA9AE6B2E04FE1D00F3F867 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				BEA25E622EB514E600D7F339 /* CBTEntry.swift */,
+				BEA25E632EB514E600D7F339 /* CognitiveDistortion.swift */,
 				BEA9AE6A2E04FE1D00F3F867 /* Note.swift */,
 			);
 			path = Models;
@@ -173,6 +199,7 @@
 		BEA9AE6D2E04FE1D00F3F867 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
+				BEA25E682EB5150000D7F339 /* CBTStore.swift */,
 				BEA9AE6C2E04FE1D00F3F867 /* NotesStore.swift */,
 			);
 			path = Stores;
@@ -190,6 +217,11 @@
 		BEA9AE732E04FE1D00F3F867 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BEA25EB22EB5639C00D7F339 /* SearchView.swift */,
+				BEA25EB02EB54E1B00D7F339 /* CBTCalendarView.swift */,
+				BEA25E6A2EB5151300D7F339 /* CBTEntryView.swift */,
+				BEA25E6B2EB5151300D7F339 /* CBTListView.swift */,
+				BEA25E6C2EB5151300D7F339 /* DistortionPickerView.swift */,
 				BE45BE7E2EAFDF07006AF91C /* EntriesEditView.swift */,
 				BEFF0A582EB271390051BC70 /* PeopleEditView.swift */,
 				BE00D7F12EA57680000203BD /* AlarmsView.swift */,
@@ -322,10 +354,18 @@
 				BE00D7F82EA57B7C000203BD /* EntriesRowView.swift in Sources */,
 				BEA9AE772E04FE1D00F3F867 /* NoteItemView.swift in Sources */,
 				BEA9AE782E04FE1D00F3F867 /* Note.swift in Sources */,
+				BEA25E662EB514EC00D7F339 /* CognitiveDistortion.swift in Sources */,
+				BEA25E672EB514EC00D7F339 /* CBTEntry.swift in Sources */,
+				BEA25EB32EB5639C00D7F339 /* SearchView.swift in Sources */,
 				BE45BE7F2EAFDF07006AF91C /* EntriesEditView.swift in Sources */,
+				BEA25EB12EB54E1B00D7F339 /* CBTCalendarView.swift in Sources */,
 				BEFF0A592EB271390051BC70 /* PeopleEditView.swift in Sources */,
+				BEA25E692EB5150000D7F339 /* CBTStore.swift in Sources */,
 				BEA9AE792E04FE1D00F3F867 /* SettingsView.swift in Sources */,
 				BE6EC8622E8B7F9F004D9E63 /* ImportNotesView.swift in Sources */,
+				BEA25E6D2EB5151300D7F339 /* CBTEntryView.swift in Sources */,
+				BEA25E6E2EB5151300D7F339 /* DistortionPickerView.swift in Sources */,
+				BEA25E6F2EB5151300D7F339 /* CBTListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

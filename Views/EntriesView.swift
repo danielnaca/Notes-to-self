@@ -115,8 +115,8 @@ struct EntriesView: View {
                 .padding(.bottom, keyboardHeight)
             }
             .ignoresSafeArea(.keyboard)
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Entries")
+            .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 setupKeyboardObservers()
             }
