@@ -12,7 +12,7 @@ A simple iOS application for taking personal notes and displaying them to you ou
 
 ## Requirements
 
-- iOS 17.0+
+- iOS 26.0+
 - Xcode 15.0+
 - Swift 5.9+
 

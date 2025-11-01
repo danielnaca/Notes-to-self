@@ -1,5 +1,5 @@
 //
-//  EntriesView.swift
+//  RemindersView.swift
 //  Notes to self
 //
 //  Created by AI Assistant on 9/30/25.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-// 📗 Entries View: Messages-style interface for quick entries
-struct EntriesView: View {
-    @EnvironmentObject var store: NotesStore
-    @State private var newEntryText: String = ""
+// 📗 Reminders View: Messages-style interface for quick reminders
+struct RemindersView: View {
+    @EnvironmentObject var store: RemindersStore
+    @State private var newReminderText: String = ""
     @State private var keyboardHeight: CGFloat = 0
     @FocusState private var isInputFocused: Bool
-    @State private var editingNoteId: UUID? = nil
+    @State private var editingReminderId: UUID? = nil
     @State private var scrollProxy: ScrollViewProxy? = nil
     
     private var isEditMode: Bool {
-        editingNoteId != nil
+        editingReminderId != nil
     }
     
     var body: some View {
@@ -30,16 +30,16 @@ struct EntriesView: View {
                             scrollProxy = proxy
                         }
                         VStack(spacing: 12) {
-                            if store.notes.isEmpty {
+                            if store.reminders.isEmpty {
                                 // Empty state
                                 VStack(spacing: 20) {
-                                    Image(systemName: "note.text")
+                                    Image(systemName: "bell")
                                         .font(.system(size: 64))
                                         .foregroundColor(AppColors.secondaryText)
-                                    Text("No entries yet")
+                                    Text("No reminders yet")
                                         .font(.title2)
                                         .foregroundColor(AppColors.secondaryText)
-                                    Text("Type a message below to create your first entry")
+                                    Text("Type a message below to create your first reminder")
                                         .font(.body)
                                         .foregroundColor(AppColors.tertiaryText)
                                         .multilineTextAlignment(.center)
@@ -47,15 +47,15 @@ struct EntriesView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.top, 100)
                             } else {
-                                // Show entries in reverse order (newest at bottom)
-                                ForEach(store.notes.reversed()) { note in
-                                    EntryMessageBubble(note: note, isEditing: isEditMode && editingNoteId == note.id)
-                                        .id(note.id)
-                                        .opacity(isEditMode && editingNoteId != note.id ? 0 : 1.0)
+                                // Show reminders in reverse order (newest at bottom)
+                                ForEach(store.reminders.reversed()) { reminder in
+                                    ReminderMessageBubble(reminder: reminder, isEditing: isEditMode && editingReminderId == reminder.id)
+                                        .id(reminder.id)
+                                        .opacity(isEditMode && editingReminderId != reminder.id ? 0 : 1.0)
                                         .onTapGesture {
                                             // Only allow editing when keyboard is closed
                                             if !isInputFocused {
-                                                startEditing(note: note)
+                                                startEditing(reminder: reminder)
                                             }
                                         }
                                 }
@@ -76,11 +76,11 @@ struct EntriesView: View {
                             }
                         }
                     )
-                    .onChange(of: store.notes.count) { _, _ in
-                        // Scroll to bottom when new entry is added
-                        if let lastNote = store.notes.first {
+                    .onChange(of: store.reminders.count) { _, _ in
+                        // Scroll to bottom when new reminder is added
+                        if let lastReminder = store.reminders.first {
                             withAnimation {
-                                proxy.scrollTo(lastNote.id, anchor: .bottom)
+                                proxy.scrollTo(lastReminder.id, anchor: .bottom)
                             }
                         }
                     }
@@ -89,7 +89,7 @@ struct EntriesView: View {
                 // Input Bar - fixed at bottom, moves with keyboard
                 VStack(spacing: 0) {
                     ZStack(alignment: .bottomTrailing) {
-                        TextField("New entry...", text: $newEntryText, axis: .vertical)
+                        TextField("New reminder...", text: $newReminderText, axis: .vertical)
                             .textFieldStyle(.plain)
                             .padding(12)
                             .padding(.trailing, 40) // Space for button
@@ -99,12 +99,12 @@ struct EntriesView: View {
                             .lineLimit(1...5)
                             .fixedSize(horizontal: false, vertical: true)
                         
-                        Button(action: sendEntry) {
+                        Button(action: sendReminder) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.system(size: 28))
-                                .foregroundColor(newEntryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? AppColors.tertiaryText : AppColors.accent)
+                                .foregroundColor(newReminderText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? AppColors.tertiaryText : AppColors.accent)
                         }
-                        .disabled(newEntryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(newReminderText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         .padding(.trailing, 8)
                         .padding(.bottom, 6)
                     }
@@ -115,7 +115,7 @@ struct EntriesView: View {
                 .padding(.bottom, keyboardHeight)
             }
             .ignoresSafeArea(.keyboard)
-            .navigationTitle("Entries")
+            .navigationTitle("Reminders")
             .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 setupKeyboardObservers()
@@ -123,49 +123,49 @@ struct EntriesView: View {
         }
     }
     
-    private func sendEntry() {
-        let trimmed = newEntryText.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func sendReminder() {
+        let trimmed = newReminderText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         
-        if let editingId = editingNoteId {
-            // Update existing note
-            if let index = store.notes.firstIndex(where: { $0.id == editingId }) {
-                let originalNote = store.notes[index]
-                let updatedNote = Note(
-                    id: originalNote.id,
+        if let editingId = editingReminderId {
+            // Update existing reminder
+            if let index = store.reminders.firstIndex(where: { $0.id == editingId }) {
+                let originalReminder = store.reminders[index]
+                let updatedReminder = ReminderEntry(
+                    id: originalReminder.id,
                     text: trimmed,
-                    date: originalNote.date,
+                    date: originalReminder.date,
                     lastModified: Date()
                 )
-                store.notes[index] = updatedNote
+                store.reminders[index] = updatedReminder
             }
-            editingNoteId = nil
+            editingReminderId = nil
         } else {
-            // Create new note
-            let newNote = Note(text: trimmed)
-            store.notes.insert(newNote, at: 0) // Store keeps newest first
+            // Create new reminder
+            let newReminder = ReminderEntry(text: trimmed)
+            store.reminders.insert(newReminder, at: 0) // Store keeps newest first
         }
         
-        newEntryText = ""
+        newReminderText = ""
         isInputFocused = false // Dismiss keyboard
     }
     
-    private func startEditing(note: Note) {
-        editingNoteId = note.id
-        newEntryText = note.text
+    private func startEditing(reminder: ReminderEntry) {
+        editingReminderId = reminder.id
+        newReminderText = reminder.text
         isInputFocused = true
         
         // Scroll the editing message to the top
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation {
-                scrollProxy?.scrollTo(note.id, anchor: .top)
+                scrollProxy?.scrollTo(reminder.id, anchor: .top)
             }
         }
     }
     
     private func cancelEditing() {
-        editingNoteId = nil
-        newEntryText = ""
+        editingReminderId = nil
+        newReminderText = ""
         isInputFocused = false
     }
     
@@ -195,14 +195,14 @@ struct EntriesView: View {
     }
 }
 
-// 📗 Entry Message Bubble: Individual entry in chat style
-struct EntryMessageBubble: View {
-    let note: Note
+// 📗 Reminder Message Bubble: Individual reminder in chat style
+struct ReminderMessageBubble: View {
+    let reminder: ReminderEntry
     let isEditing: Bool
     
     var body: some View {
         HStack {
-            Text(note.text)
+            Text(reminder.text)
                 .font(.body)
                 .foregroundColor(AppColors.noteText)
             Spacer()
@@ -214,7 +214,7 @@ struct EntryMessageBubble: View {
 }
 
 #Preview {
-    EntriesView()
-        .environmentObject(NotesStore())
+    RemindersView()
+        .environmentObject(RemindersStore())
 }
 

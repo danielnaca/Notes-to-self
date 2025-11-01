@@ -11,7 +11,8 @@ import UserNotifications
 // 📗 Main App: Root application structure
 @main
 struct Notes_to_selfApp: App {
-    @StateObject private var store = NotesStore()
+    @StateObject private var remindersStore = RemindersStore()
+    @StateObject private var peopleStore = PeopleStore()
     @StateObject private var cbtStore = CBTStore()
     @StateObject private var todoStore = TodoStore()
     @Environment(\.scenePhase) private var scenePhase
@@ -19,14 +20,15 @@ struct Notes_to_selfApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(store)
+                .environmentObject(remindersStore)
+                .environmentObject(peopleStore)
                 .environmentObject(cbtStore)
                 .environmentObject(todoStore)
                 .onAppear {
-                    print("📱 App appeared - NotesStore created")
-                    store.refreshNotificationQueue()
+                    print("📱 App appeared - RemindersStore and PeopleStore created")
+                    remindersStore.refreshNotificationQueue()
                 }
-                .alert("Enable Notifications", isPresented: $store.showNotificationAlert) {
+                .alert("Enable Notifications", isPresented: $remindersStore.showNotificationAlert) {
                     Button("OK", role: .cancel) {}
                 } message: {
                     Text("To get reminders, please enable notifications in Settings.")
@@ -34,7 +36,7 @@ struct Notes_to_selfApp: App {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                store.refreshNotificationQueue()
+                remindersStore.refreshNotificationQueue()
             }
         }
     }

@@ -16,45 +16,81 @@ class CloudKitManager {
     private let privateDatabase: CKDatabase
     
     // Record type names
-    private let noteRecordType = "Note"
+    private let reminderRecordType = "ReminderEntry"
+    private let personRecordType = "PersonEntry"
     private let cbtEntryRecordType = "CBTEntry"
+    private let todoRecordType = "TodoItem"
     
     private init() {
         container = CKContainer.default()
         privateDatabase = container.privateCloudDatabase
     }
     
-    // MARK: - Note Operations
+    // MARK: - Reminder Operations
     
-    func saveNote(_ note: Note, isPersonNote: Bool) async throws {
-        let record = noteToRecord(note, isPersonNote: isPersonNote)
+    func saveReminder(_ reminder: ReminderEntry) async throws {
+        let record = reminderToRecord(reminder)
         try await privateDatabase.save(record)
     }
     
-    func fetchNotes(isPersonNote: Bool) async throws -> [Note] {
-        let predicate = NSPredicate(format: "isPersonNote == %@", NSNumber(value: isPersonNote))
-        let query = CKQuery(recordType: noteRecordType, predicate: predicate)
+    func fetchReminders() async throws -> [ReminderEntry] {
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: reminderRecordType, predicate: predicate)
         query.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         
         let results = try await privateDatabase.records(matching: query)
         
-        var notes: [Note] = []
+        var reminders: [ReminderEntry] = []
         for (_, result) in results.matchResults {
             switch result {
             case .success(let record):
-                if let note = recordToNote(record) {
-                    notes.append(note)
+                if let reminder = recordToReminder(record) {
+                    reminders.append(reminder)
                 }
             case .failure(let error):
-                print("Error fetching note: \(error)")
+                print("Error fetching reminder: \(error)")
             }
         }
         
-        return notes
+        return reminders
     }
     
-    func deleteNote(_ note: Note) async throws {
-        let recordID = CKRecord.ID(recordName: note.id.uuidString)
+    func deleteReminder(_ reminder: ReminderEntry) async throws {
+        let recordID = CKRecord.ID(recordName: reminder.id.uuidString)
+        try await privateDatabase.deleteRecord(withID: recordID)
+    }
+    
+    // MARK: - Person Operations
+    
+    func savePerson(_ person: PersonEntry) async throws {
+        let record = personToRecord(person)
+        try await privateDatabase.save(record)
+    }
+    
+    func fetchPeople() async throws -> [PersonEntry] {
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: personRecordType, predicate: predicate)
+        query.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        
+        let results = try await privateDatabase.records(matching: query)
+        
+        var people: [PersonEntry] = []
+        for (_, result) in results.matchResults {
+            switch result {
+            case .success(let record):
+                if let person = recordToPerson(record) {
+                    people.append(person)
+                }
+            case .failure(let error):
+                print("Error fetching person: \(error)")
+            }
+        }
+        
+        return people
+    }
+    
+    func deletePerson(_ person: PersonEntry) async throws {
+        let recordID = CKRecord.ID(recordName: person.id.uuidString)
         try await privateDatabase.deleteRecord(withID: recordID)
     }
     
@@ -101,8 +137,8 @@ class CloudKitManager {
     
     // MARK: - Batch Operations
     
-    func saveNotes(_ notes: [Note], isPersonNote: Bool) async throws {
-        let records = notes.map { noteToRecord($0, isPersonNote: isPersonNote) }
+    func saveReminders(_ reminders: [ReminderEntry]) async throws {
+        let records = reminders.map { reminderToRecord($0) }
         
         // CloudKit has a limit of 400 operations per request
         let batchSize = 400
@@ -113,7 +149,23 @@ class CloudKitManager {
             // Check for errors
             for (_, result) in saveResults {
                 if case .failure(let error) = result {
-                    print("Error saving note: \(error)")
+                    print("Error saving reminder: \(error)")
+                }
+            }
+        }
+    }
+    
+    func savePeople(_ people: [PersonEntry]) async throws {
+        let records = people.map { personToRecord($0) }
+        
+        let batchSize = 400
+        for i in stride(from: 0, to: records.count, by: batchSize) {
+            let batch = Array(records[i..<min(i + batchSize, records.count)])
+            let (saveResults, _) = try await privateDatabase.modifyRecords(saving: batch, deleting: [])
+            
+            for (_, result) in saveResults {
+                if case .failure(let error) = result {
+                    print("Error saving person: \(error)")
                 }
             }
         }
@@ -135,30 +187,113 @@ class CloudKitManager {
         }
     }
     
+    func saveTodos(_ todos: [TodoItem]) async throws {
+        let records = todos.map { todoToRecord($0) }
+        
+        let batchSize = 400
+        for i in stride(from: 0, to: records.count, by: batchSize) {
+            let batch = Array(records[i..<min(i + batchSize, records.count)])
+            let (saveResults, _) = try await privateDatabase.modifyRecords(saving: batch, deleting: [])
+            
+            for (_, result) in saveResults {
+                if case .failure(let error) = result {
+                    print("Error saving todo: \(error)")
+                }
+            }
+        }
+    }
+    
+    func fetchTodos() async throws -> [TodoItem] {
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: todoRecordType, predicate: predicate)
+        query.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        
+        let results = try await privateDatabase.records(matching: query)
+        
+        var todos: [TodoItem] = []
+        for (_, result) in results.matchResults {
+            switch result {
+            case .success(let record):
+                if let todo = recordToTodo(record) {
+                    todos.append(todo)
+                }
+            case .failure(let error):
+                print("Error fetching todo: \(error)")
+            }
+        }
+        
+        return todos
+    }
+    
     // MARK: - Conversion Methods
     
-    private func noteToRecord(_ note: Note, isPersonNote: Bool) -> CKRecord {
-        let recordID = CKRecord.ID(recordName: note.id.uuidString)
-        let record = CKRecord(recordType: noteRecordType, recordID: recordID)
+    private func reminderToRecord(_ reminder: ReminderEntry) -> CKRecord {
+        let recordID = CKRecord.ID(recordName: reminder.id.uuidString)
+        let record = CKRecord(recordType: reminderRecordType, recordID: recordID)
         
-        record["text"] = note.text as CKRecordValue
-        record["date"] = note.date as CKRecordValue
-        record["lastModified"] = note.lastModified as CKRecordValue
-        record["isPersonNote"] = (isPersonNote ? 1 : 0) as CKRecordValue
+        record["text"] = reminder.text as CKRecordValue
+        record["date"] = reminder.date as CKRecordValue
+        record["lastModified"] = reminder.lastModified as CKRecordValue
         
         return record
     }
     
-    private func recordToNote(_ record: CKRecord) -> Note? {
-        guard let idString = record.recordID.recordName,
-              let id = UUID(uuidString: idString),
+    private func recordToReminder(_ record: CKRecord) -> ReminderEntry? {
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
               let text = record["text"] as? String,
               let date = record["date"] as? Date,
               let lastModified = record["lastModified"] as? Date else {
             return nil
         }
         
-        return Note(id: id, text: text, date: date, lastModified: lastModified)
+        return ReminderEntry(id: id, text: text, date: date, lastModified: lastModified)
+    }
+    
+    private func personToRecord(_ person: PersonEntry) -> CKRecord {
+        let recordID = CKRecord.ID(recordName: person.id.uuidString)
+        let record = CKRecord(recordType: personRecordType, recordID: recordID)
+        
+        record["text"] = person.text as CKRecordValue
+        record["date"] = person.date as CKRecordValue
+        record["lastModified"] = person.lastModified as CKRecordValue
+        
+        return record
+    }
+    
+    private func recordToPerson(_ record: CKRecord) -> PersonEntry? {
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
+              let text = record["text"] as? String,
+              let date = record["date"] as? Date,
+              let lastModified = record["lastModified"] as? Date else {
+            return nil
+        }
+        
+        return PersonEntry(id: id, text: text, date: date, lastModified: lastModified)
+    }
+    
+    private func todoToRecord(_ todo: TodoItem) -> CKRecord {
+        let recordID = CKRecord.ID(recordName: todo.id.uuidString)
+        let record = CKRecord(recordType: todoRecordType, recordID: recordID)
+        
+        record["text"] = todo.text as CKRecordValue
+        record["isCompleted"] = (todo.isCompleted ? 1 : 0) as CKRecordValue
+        record["date"] = todo.date as CKRecordValue
+        
+        return record
+    }
+    
+    private func recordToTodo(_ record: CKRecord) -> TodoItem? {
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
+              let text = record["text"] as? String,
+              let isCompletedInt = record["isCompleted"] as? Int,
+              let date = record["date"] as? Date else {
+            return nil
+        }
+        
+        return TodoItem(id: id, text: text, isCompleted: isCompletedInt == 1, date: date)
     }
     
     private func cbtEntryToRecord(_ entry: CBTEntry) -> CKRecord {
@@ -180,8 +315,8 @@ class CloudKitManager {
     }
     
     private func recordToCBTEntry(_ record: CKRecord) -> CBTEntry? {
-        guard let idString = record.recordID.recordName,
-              let id = UUID(uuidString: idString),
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
               let situation = record["situation"] as? String,
               let challenge = record["challenge"] as? String,
               let alternative = record["alternative"] as? String,

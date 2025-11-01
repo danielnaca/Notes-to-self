@@ -1,15 +1,16 @@
 import SwiftUI
 
-// 📗 Note Item: Individual note row in the list
-struct NoteItemView: View {
-    let note: Note
+// 📗 Reminder Item: Individual reminder row in the list
+struct ReminderItemView: View {
+    let reminder: ReminderEntry
     
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(note.text)
+            Text(reminder.text)
                 .foregroundColor(AppColors.noteText)
         }
         .listRowBackground(AppColors.listBackground)
-        .id(note.id)
+        .id(reminder.id)
     }
-} 
+}
+

@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-// 📗 Search View: Global search across Entries and People
+// 📗 Search View: Global search across Reminders, People, and CBT
 struct SearchView: View {
-    @EnvironmentObject var store: NotesStore
+    @EnvironmentObject var remindersStore: RemindersStore
+    @EnvironmentObject var peopleStore: PeopleStore
     @Binding var isActive: Bool
     @State private var searchText = ""
     @FocusState private var isSearchFocused: Bool
@@ -20,14 +21,14 @@ struct SearchView: View {
         
         var results: [SearchResult] = []
         
-        // Search entries
-        let matchingEntries = store.notes.filter { note in
-            note.text.localizedCaseInsensitiveContains(searchText)
+        // Search reminders
+        let matchingReminders = remindersStore.reminders.filter { reminder in
+            reminder.text.localizedCaseInsensitiveContains(searchText)
         }
-        results.append(contentsOf: matchingEntries.map { SearchResult.entry($0) })
+        results.append(contentsOf: matchingReminders.map { SearchResult.reminder($0) })
         
         // Search people
-        let matchingPeople = store.people.filter { person in
+        let matchingPeople = peopleStore.people.filter { person in
             person.text.localizedCaseInsensitiveContains(searchText)
         }
         results.append(contentsOf: matchingPeople.map { SearchResult.person($0) })
@@ -45,10 +46,10 @@ struct SearchView: View {
                             Image(systemName: "magnifyingglass")
                                 .font(.system(size: 64))
                                 .foregroundColor(AppColors.secondaryText)
-                            Text("Search Entries and People")
+                            Text("Search Reminders and People")
                                 .font(.title2)
                                 .foregroundColor(AppColors.secondaryText)
-                            Text("Start typing to find your notes")
+                            Text("Start typing to find your content")
                                 .font(.body)
                                 .foregroundColor(AppColors.tertiaryText)
                                 .multilineTextAlignment(.center)
@@ -63,7 +64,7 @@ struct SearchView: View {
                             Text("No Results")
                                 .font(.title2)
                                 .foregroundColor(AppColors.secondaryText)
-                            Text("No entries or people match '\(searchText)'")
+                            Text("No reminders or people match '\(searchText)'")
                                 .font(.body)
                                 .foregroundColor(AppColors.tertiaryText)
                                 .multilineTextAlignment(.center)
@@ -164,26 +165,26 @@ struct SearchView: View {
     @ViewBuilder
     private func destinationView(for result: SearchResult) -> some View {
         switch result {
-        case .entry(let note):
-            EntryDetailView(note: note)
-                .environmentObject(store)
-        case .person(let note):
-            PeopleEditView(note: note)
-                .environmentObject(store)
+        case .reminder(let reminder):
+            ReminderDetailView(reminder: reminder)
+                .environmentObject(remindersStore)
+        case .person(let person):
+            PeopleEditView(person: person)
+                .environmentObject(peopleStore)
         }
     }
 }
 
-// 📗 Entry Detail View: Shows a single entry's content
-struct EntryDetailView: View {
-    let note: Note
-    @EnvironmentObject var store: NotesStore
+// 📗 Reminder Detail View: Shows a single reminder's content
+struct ReminderDetailView: View {
+    let reminder: ReminderEntry
+    @EnvironmentObject var store: RemindersStore
     
     private var formattedDate: String {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .short
-        return formatter.string(from: note.date)
+        return formatter.string(from: reminder.date)
     }
     
     var body: some View {
@@ -193,7 +194,7 @@ struct EntryDetailView: View {
                     .font(.caption)
                     .foregroundColor(AppColors.secondaryText)
                 
-                Text(note.text)
+                Text(reminder.text)
                     .font(.body)
                     .foregroundColor(AppColors.noteText)
                     .textSelection(.enabled)
@@ -202,33 +203,46 @@ struct EntryDetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Color.white)
-        .navigationTitle("Entry")
+        .navigationTitle("Reminder")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-// 📗 Search Result: Union type for entries and people
+// 📗 Search Result: Union type for reminders and people
 enum SearchResult: Identifiable {
-    case entry(Note)
-    case person(Note)
+    case reminder(ReminderEntry)
+    case person(PersonEntry)
     
     var id: UUID {
         switch self {
-        case .entry(let note), .person(let note):
-            return note.id
+        case .reminder(let reminder):
+            return reminder.id
+        case .person(let person):
+            return person.id
         }
     }
     
-    var note: Note {
+    var text: String {
         switch self {
-        case .entry(let note), .person(let note):
-            return note
+        case .reminder(let reminder):
+            return reminder.text
+        case .person(let person):
+            return person.text
+        }
+    }
+    
+    var date: Date {
+        switch self {
+        case .reminder(let reminder):
+            return reminder.date
+        case .person(let person):
+            return person.date
         }
     }
     
     var type: String {
         switch self {
-        case .entry: return "Entry"
+        case .reminder: return "Reminder"
         case .person: return "Person"
         }
     }
@@ -240,7 +254,7 @@ struct SearchResultRow: View {
     let searchText: String
     
     private var preview: String {
-        let text = result.note.text
+        let text = result.text
         let lines = text.components(separatedBy: CharacterSet.newlines)
         return lines.first?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) ?? "Empty"
     }
@@ -255,10 +269,10 @@ struct SearchResultRow: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(result.type == "Entry" ? Color.blue : Color.purple)
+                        .background(result.type == "Reminder" ? Color.blue : Color.purple)
                         .cornerRadius(4)
                     
-                    Text(result.note.date, style: .date)
+                    Text(result.date, style: .date)
                         .font(.caption)
                         .foregroundColor(AppColors.secondaryText)
                 }
@@ -281,6 +295,7 @@ struct SearchResultRow: View {
 
 #Preview {
     SearchView(isActive: .constant(true))
-        .environmentObject(NotesStore())
+        .environmentObject(RemindersStore())
+        .environmentObject(PeopleStore())
 }
 

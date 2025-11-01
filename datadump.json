@@ -1,0 +1,400 @@
+{
+  "cbtEntries": [
+    {
+      "alternative": "",
+      "challenge": "",
+      "date": "2025-10-31T22:18:31Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000003"
+      ],
+      "id": "A2320CFB-874A-4EB2-8B04-3A3922C739CF",
+      "lastModified": "2025-10-31T22:18:31Z",
+      "notes": "",
+      "situation": ""
+    },
+    {
+      "alternative": "People care less about my mistakes than I think.",
+      "challenge": "I've handled similar situations well before",
+      "date": "2025-10-29T17:46:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000010",
+        "00000000-0000-0000-0000-000000000004"
+      ],
+      "id": "1DBF5255-0778-4D3A-9BBF-C26589432C2C",
+      "lastModified": "2025-10-29T17:46:53Z",
+      "notes": "Reminded myself of past successes",
+      "situation": "Made a mistake in front of everyone"
+    },
+    {
+      "alternative": "I'm allowed to be imperfect and still be valued.",
+      "challenge": "Most people are focused on themselves, not judging me",
+      "date": "2025-10-29T04:23:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000008"
+      ],
+      "id": "9C9EF643-C7D5-413B-9ED7-AEA03B11157A",
+      "lastModified": "2025-10-29T04:23:53Z",
+      "notes": "Reminded myself of past successes",
+      "situation": "Someone interrupted me while speaking"
+    },
+    {
+      "alternative": "My feelings are valid but they're not facts.",
+      "challenge": "This feeling will pass like it always does",
+      "date": "2025-10-27T13:31:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000002",
+        "00000000-0000-0000-0000-000000000006",
+        "00000000-0000-0000-0000-000000000003"
+      ],
+      "id": "3C1A416F-D222-4F79-8AF8-5C30A6C69F2A",
+      "lastModified": "2025-10-27T13:31:53Z",
+      "notes": "Talked to a friend about it",
+      "situation": "Coworker didn't respond to my email"
+    },
+    {
+      "alternative": "Everyone makes mistakes. This is a chance to learn and grow.",
+      "challenge": "I've handled similar situations well before",
+      "date": "2025-10-27T09:29:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000006"
+      ],
+      "id": "2A5EE249-2475-471A-A26D-6389D52BED78",
+      "lastModified": "2025-10-27T09:29:53Z",
+      "notes": "This feeling passed within an hour",
+      "situation": "Felt left out of a conversation"
+    },
+    {
+      "alternative": "I can handle uncertainty and discomfort.",
+      "challenge": "Other people likely didn't notice or already forgot",
+      "date": "2025-10-27T05:21:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000006"
+      ],
+      "id": "60DD23F0-A477-4877-A224-39E8352A6CF1",
+      "lastModified": "2025-10-27T05:21:53Z",
+      "notes": "Similar to last week's situation",
+      "situation": "Friend cancelled plans last minute"
+    },
+    {
+      "alternative": "I'm doing better than my anxiety tells me.",
+      "challenge": "I'm probably overthinking this situation",
+      "date": "2025-10-15T19:49:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000004"
+      ],
+      "id": "825675ED-EB31-4772-9055-AEAB74A64A7C",
+      "lastModified": "2025-10-15T19:49:53Z",
+      "notes": "Felt better after writing this down",
+      "situation": "Got negative feedback on my project"
+    },
+    {
+      "alternative": "Everyone makes mistakes. This is a chance to learn and grow.",
+      "challenge": "There could be many explanations I haven't considered",
+      "date": "2025-10-07T08:39:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000004"
+      ],
+      "id": "F7C0377D-6F42-4AED-9344-E184AC1CCC12",
+      "lastModified": "2025-10-07T08:39:53Z",
+      "notes": "",
+      "situation": "Text message left on read"
+    },
+    {
+      "alternative": "I did my best with what I knew at the time.",
+      "challenge": "Maybe they're just busy and haven't had time to respond",
+      "date": "2025-10-07T04:06:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000005"
+      ],
+      "id": "C3C91112-5D1B-4769-ADD7-3DBEFCF1811D",
+      "lastModified": "2025-10-07T04:06:53Z",
+      "notes": "Talked to a friend about it",
+      "situation": "Boss seemed annoyed with me"
+    },
+    {
+      "alternative": "My feelings are valid but they're not facts.",
+      "challenge": "Maybe they're just busy and haven't had time to respond",
+      "date": "2025-10-03T04:47:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000009"
+      ],
+      "id": "EEA8AA2D-A877-430C-B8E0-046F1D1E6CC7",
+      "lastModified": "2025-10-03T04:47:53Z",
+      "notes": "",
+      "situation": "Post didn't get many likes"
+    },
+    {
+      "alternative": "I'm doing better than my anxiety tells me.",
+      "challenge": "Maybe they're just busy and haven't had time to respond",
+      "date": "2025-09-26T05:04:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000005",
+        "00000000-0000-0000-0000-000000000004"
+      ],
+      "id": "9F2E8FAC-30A1-418A-BA51-B6287FA6B71A",
+      "lastModified": "2025-09-26T05:04:53Z",
+      "notes": "This feeling passed within an hour",
+      "situation": "Didn't understand something everyone else got"
+    },
+    {
+      "alternative": "I can reach out again later if needed. It's not a reflection of my worth.",
+      "challenge": "There could be many explanations I haven't considered",
+      "date": "2025-09-03T01:11:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000010",
+        "00000000-0000-0000-0000-000000000004",
+        "00000000-0000-0000-0000-000000000009"
+      ],
+      "id": "82DB1E94-22DF-4490-9067-FE1018C13D5C",
+      "lastModified": "2025-09-03T01:11:53Z",
+      "notes": "Talked to a friend about it",
+      "situation": "My presentation didn't go as planned"
+    },
+    {
+      "alternative": "I can reach out again later if needed. It's not a reflection of my worth.",
+      "challenge": "This feeling will pass like it always does",
+      "date": "2025-09-02T23:03:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000009",
+        "00000000-0000-0000-0000-000000000008"
+      ],
+      "id": "BCE11203-619A-4FF7-82D4-BE198C0F1944",
+      "lastModified": "2025-09-02T23:03:53Z",
+      "notes": "Reminded myself of past successes",
+      "situation": "Interview didn't go well"
+    },
+    {
+      "alternative": "I'm allowed to be imperfect and still be valued.",
+      "challenge": "I'm probably overthinking this situation",
+      "date": "2025-09-02T10:36:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000010"
+      ],
+      "id": "0B8DB4E7-B6BF-4061-B7B0-0D07456C0162",
+      "lastModified": "2025-09-02T10:36:53Z",
+      "notes": "Sleep helped put things in perspective",
+      "situation": "Partner seemed distant today"
+    },
+    {
+      "alternative": "This too shall pass, and I'll be okay.",
+      "challenge": "I'm being harder on myself than I need to be",
+      "date": "2025-08-27T15:22:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000010",
+        "00000000-0000-0000-0000-000000000010",
+        "00000000-0000-0000-0000-000000000007"
+      ],
+      "id": "39E13377-C10F-47AE-976E-F120B2FFADA2",
+      "lastModified": "2025-08-27T15:22:53Z",
+      "notes": "Went for a walk to clear my head",
+      "situation": "Made a silly typo in an important document"
+    },
+    {
+      "alternative": "This is one moment in my life, not the whole story.",
+      "challenge": "Most people are focused on themselves, not judging me",
+      "date": "2025-08-26T19:07:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000002"
+      ],
+      "id": "CC83B8AD-78C5-49DE-A27D-6A6794B99392",
+      "lastModified": "2025-08-26T19:07:53Z",
+      "notes": "Sleep helped put things in perspective",
+      "situation": "Said something awkward in the meeting"
+    },
+    {
+      "alternative": "I'm allowed to be imperfect and still be valued.",
+      "challenge": "I've handled similar situations well before",
+      "date": "2025-07-20T03:29:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000008",
+        "00000000-0000-0000-0000-000000000009"
+      ],
+      "id": "33082D68-48CA-4761-998A-B821DFFD47AD",
+      "lastModified": "2025-07-20T03:29:53Z",
+      "notes": "Similar to last week's situation",
+      "situation": "Failed to meet my own expectations"
+    },
+    {
+      "alternative": "I can reach out again later if needed. It's not a reflection of my worth.",
+      "challenge": "There could be many explanations I haven't considered",
+      "date": "2025-07-17T02:27:53Z",
+      "distortionIds": [
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000003"
+      ],
+      "id": "8B77D2D2-A1CA-4182-9B17-0D55839BDEFA",
+      "lastModified": "2025-07-17T02:27:53Z",
+      "notes": "Felt better after writing this down",
+      "situation": "Didn't get invited to the party"
+    }
+  ],
+  "exportDate": "2025-10-31T23:48:51Z",
+  "people": [
+    {
+      "date": "2025-10-19T19:55:06Z",
+      "id": "E765C7EA-7AB9-4DBC-93A7-4696A572BBB8",
+      "lastModified": "2025-10-19T19:55:06Z",
+      "text": "Gffbnffvd. D"
+    }
+  ],
+  "reminders": [
+    {
+      "date": "2025-10-31T14:40:22Z",
+      "id": "9D210731-E4B4-47F8-8884-A7F38F258A1C",
+      "lastModified": "2025-10-31T14:40:22Z",
+      "text": "Dodd tjr tjr tjr tjr de end fjf fjf fjf fjf fjf fjf fjf ff ff"
+    },
+    {
+      "date": "2025-10-31T14:32:03Z",
+      "id": "7FA4CD5C-884C-4FC5-9887-6636ADB2D3C7",
+      "lastModified": "2025-10-31T14:32:03Z",
+      "text": "She h\u00e9berge"
+    },
+    {
+      "date": "2025-10-31T14:30:22Z",
+      "id": "74870A69-5169-4A19-8A6C-EFF842692ECC",
+      "lastModified": "2025-10-31T14:30:22Z",
+      "text": "D\u2019h\u00e9breu"
+    },
+    {
+      "date": "2025-10-31T14:29:54Z",
+      "id": "A206533D-6E36-4CBF-BE66-C8B0C9387B4B",
+      "lastModified": "2025-10-31T14:29:54Z",
+      "text": "Deven dieu djej"
+    },
+    {
+      "date": "2025-10-23T00:20:12Z",
+      "id": "2A54FF1D-8746-4B55-B4B2-5D3325F67F91",
+      "lastModified": "2025-10-23T00:20:12Z",
+      "text": "Lead with content"
+    },
+    {
+      "date": "2025-10-19T23:08:58Z",
+      "id": "5AA32FA3-FBD4-4DFE-9C1D-24102AE92F8B",
+      "lastModified": "2025-10-19T23:08:58Z",
+      "text": "Find the truth"
+    },
+    {
+      "date": "2025-10-19T19:52:17Z",
+      "id": "7C9A1793-EDCA-4C06-95D5-B24AA686F14F",
+      "lastModified": "2025-10-27T14:55:49Z",
+      "text": "Stop saying like"
+    },
+    {
+      "date": "2025-10-19T18:46:37Z",
+      "id": "7526EDB3-0086-4F43-AE6F-22A8852096EC",
+      "lastModified": "2025-10-19T18:46:37Z",
+      "text": "Don\u2019t be difficult, keep that job at all cost"
+    },
+    {
+      "date": "2025-10-19T18:46:28Z",
+      "id": "66528B12-C936-4354-93AC-26A02E2B18E2",
+      "lastModified": "2025-10-19T18:46:28Z",
+      "text": "Avoid ants are revisionist about the past, you can\u2019t recreate the chemistry you had"
+    },
+    {
+      "date": "2025-10-19T18:46:06Z",
+      "id": "B95EA0A9-B9E6-48BE-81BA-FE33A3DC9E41",
+      "lastModified": "2025-10-19T18:46:06Z",
+      "text": "Make an effort, don\u2019t take your girlfriend for granted"
+    },
+    {
+      "date": "2025-10-19T18:45:42Z",
+      "id": "A4BF9244-8944-475E-AA2A-DB5FD4124E03",
+      "lastModified": "2025-10-19T18:45:42Z",
+      "text": "Always ask yourself is it normal to feel like this? Maybe most people do."
+    },
+    {
+      "date": "2025-10-19T18:45:20Z",
+      "id": "C88D09D1-71B0-4632-8737-147EEFF92C84",
+      "lastModified": "2025-10-19T18:45:20Z",
+      "text": "When people are going through turmoil and snub you, you take it as rejection and get needy"
+    },
+    {
+      "date": "2025-10-19T18:45:09Z",
+      "id": "C375548E-BE18-4513-8892-4695676DC28D",
+      "lastModified": "2025-10-19T18:45:09Z",
+      "text": "I\u2019m very naive with some stuff and very suspicious with other (work hypocrisy vs girlfriend jealousy)"
+    },
+    {
+      "date": "2025-10-19T18:42:47Z",
+      "id": "94916E64-2514-49CC-993C-5AEB5C9D1B8F",
+      "lastModified": "2025-10-19T18:42:47Z",
+      "text": "Don\u2019t be judge-mental, like Dominic"
+    },
+    {
+      "date": "2025-10-19T18:42:17Z",
+      "id": "FD31005E-1244-4DB6-A63F-10F6DDF8A2C7",
+      "lastModified": "2025-10-19T18:42:17Z",
+      "text": "Don\u2019t be a snob, especially about people."
+    },
+    {
+      "date": "2025-10-19T18:42:05Z",
+      "id": "8FC49F28-5F46-4A69-8A1E-B0591C8458EB",
+      "lastModified": "2025-10-19T18:42:05Z",
+      "text": "Barcelona is not SF"
+    },
+    {
+      "date": "2025-10-19T18:41:55Z",
+      "id": "A99DF4B4-47C7-4FE1-BBF8-46F7DFD0659C",
+      "lastModified": "2025-10-19T18:41:55Z",
+      "text": "Make life at work easy, don\u2019t bite off more than you need to chew or go out of scope, more than what\u2019s asked for"
+    },
+    {
+      "date": "2025-10-19T18:41:32Z",
+      "id": "183B92AF-24C4-49CE-A0C5-FED0E66F04A0",
+      "lastModified": "2025-10-19T18:41:32Z",
+      "text": "Eat slowly"
+    },
+    {
+      "date": "2025-10-19T18:41:23Z",
+      "id": "90308E71-E839-4EC8-915F-8BD81F0A132E",
+      "lastModified": "2025-10-19T18:41:23Z",
+      "text": "Don\u2019t put it down, put it away"
+    },
+    {
+      "date": "2025-10-19T18:41:14Z",
+      "id": "064AF86E-1A33-4424-84ED-BE6188A40159",
+      "lastModified": "2025-10-19T18:41:14Z",
+      "text": "Give other people space to breathe"
+    },
+    {
+      "date": "2025-10-19T18:41:02Z",
+      "id": "59B9C69E-A87C-4B63-9257-B193282706DE",
+      "lastModified": "2025-10-19T18:41:02Z",
+      "text": "When you\u2019re anxious about messaging someone it\u2019s the moment not to"
+    },
+    {
+      "date": "2025-10-19T18:40:54Z",
+      "id": "CD6E7FE5-7024-47D3-A103-4C368AD230BE",
+      "lastModified": "2025-10-19T18:40:54Z",
+      "text": "Some people you just never get over"
+    },
+    {
+      "date": "2025-10-19T18:40:44Z",
+      "id": "4881C276-9B5F-4855-9940-1ED7D6BE808A",
+      "lastModified": "2025-10-19T18:40:44Z",
+      "text": "The Eng will always be more important than the dev"
+    },
+    {
+      "date": "2025-10-19T18:40:35Z",
+      "id": "18552469-6676-4258-AE4A-3C692A5FF497",
+      "lastModified": "2025-10-31T15:10:41Z",
+      "text": "Daddy is old, don\u2019t get impatient, he can\u2019t always perform dhdhd dh"
+    },
+    {
+      "date": "2025-10-19T18:39:58Z",
+      "id": "041BA76E-9E4E-493D-BC91-3DD319DEB77D",
+      "lastModified": "2025-10-19T18:39:58Z",
+      "text": "You can\u2019t change what you can\u2019t control"
+    },
+    {
+      "date": "2025-09-30T02:47:20Z",
+      "id": "54239C0A-0997-4F0B-9316-7CC04BE22282",
+      "lastModified": "2025-10-19T18:40:26Z",
+      "text": "Hurt people hurt people"
+    }
+  ]
+}

@@ -9,13 +9,13 @@ import SwiftUI
 
 // 📗 Complete App Data: Contains all data for export/import
 struct CompleteAppData: Codable {
-    let entries: [Note]
-    let people: [Note]
+    let reminders: [ReminderEntry]
+    let people: [PersonEntry]
     let cbtEntries: [CBTEntry]
     let exportDate: Date
     
-    init(entries: [Note], people: [Note], cbtEntries: [CBTEntry]) {
-        self.entries = entries
+    init(reminders: [ReminderEntry], people: [PersonEntry], cbtEntries: [CBTEntry]) {
+        self.reminders = reminders
         self.people = people
         self.cbtEntries = cbtEntries
         self.exportDate = Date()
@@ -24,7 +24,8 @@ struct CompleteAppData: Codable {
 
 // 📗 Settings Screen: Configuration screen for app preferences
 struct SettingsView: View {
-    @EnvironmentObject var store: NotesStore
+    @EnvironmentObject var remindersStore: RemindersStore
+    @EnvironmentObject var peopleStore: PeopleStore
     @EnvironmentObject var cbtStore: CBTStore
     @EnvironmentObject var todoStore: TodoStore
     @State private var notificationsPerWeek: Double = 2
@@ -38,75 +39,100 @@ struct SettingsView: View {
     @State private var showingUIVocabulary = false
     @State private var showingTodoList = false
     
-    var body: some View {
-        NavigationView {
-            Form {
-                Section("Developer") {
-                    Button("UI Vocabulary") {
-                        showingUIVocabulary = true
-                    }
-                    
-                    Button("Todo List") {
-                        showingTodoList = true
-                    }
-                }
-                
-                Section("Notifications") {
-                    Toggle("Enable Notifications", isOn: $notificationsEnabled)
-                    
-                    if notificationsEnabled {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Notifications per week: \(Int(notificationsPerWeek))")
-                            Slider(value: $notificationsPerWeek, in: 1...7, step: 1)
-                        }
-                    }
-                }
-                
-                Section("Data Management") {
-                    Button("Export All Data") {
-                        exportAllData()
-                    }
-                    .disabled(store.notes.isEmpty && store.people.isEmpty && cbtStore.entries.isEmpty)
-                    
-                    Button("Import All Data") {
-                        showingImportView = true
-                    }
-                    
-                    Button("Delete All Data") {
-                        showDeleteAllAlert = true
-                    }
-                    .foregroundColor(.red)
-                    .disabled(store.notes.isEmpty && store.people.isEmpty && cbtStore.entries.isEmpty)
-                }
-                
-                Section("Statistics") {
-                    HStack {
-                        Text("Total Notes")
-                        Spacer()
-                        Text("\(store.notes.count)")
-                            .foregroundColor(AppColors.secondaryText)
-                    }
-                    
-                    HStack {
-                        Text("Total People")
-                        Spacer()
-                        Text("\(store.people.count)")
-                            .foregroundColor(AppColors.secondaryText)
-                    }
-                    
-                    HStack {
-                        Text("Total CBT Entries")
-                        Spacer()
-                        Text("\(cbtStore.entries.count)")
-                            .foregroundColor(AppColors.secondaryText)
-                    }
+    private var isAllDataEmpty: Bool {
+        remindersStore.reminders.isEmpty && peopleStore.people.isEmpty && cbtStore.entries.isEmpty
+    }
+    
+    // MARK: - Sections
+    
+    private var developerSection: some View {
+        Section("Developer") {
+            Button("UI Vocabulary") {
+                showingUIVocabulary = true
+            }
+            
+            Button("Todo List") {
+                showingTodoList = true
+            }
+        }
+    }
+    
+    private var notificationsSection: some View {
+        Section("Notifications") {
+            Toggle("Enable Notifications", isOn: $notificationsEnabled)
+            
+            if notificationsEnabled {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Notifications per week: \(Int(notificationsPerWeek))")
+                    Slider(value: $notificationsPerWeek, in: 1...7, step: 1)
                 }
             }
+        }
+    }
+    
+    private var dataManagementSection: some View {
+        Section("Data Management") {
+            Button("Export All Data") {
+                exportAllData()
+            }
+            .disabled(isAllDataEmpty)
+            
+            Button("Import All Data") {
+                showingImportView = true
+            }
+            
+            Button("Delete All Data") {
+                showDeleteAllAlert = true
+            }
+            .foregroundColor(.red)
+            .disabled(isAllDataEmpty)
+        }
+    }
+    
+    private var statisticsSection: some View {
+        Section("Statistics") {
+            HStack {
+                Text("Total Reminders")
+                Spacer()
+                Text("\(remindersStore.reminders.count)")
+                    .foregroundColor(AppColors.secondaryText)
+            }
+            
+            HStack {
+                Text("Total People")
+                Spacer()
+                Text("\(peopleStore.people.count)")
+                    .foregroundColor(AppColors.secondaryText)
+            }
+            
+            HStack {
+                Text("Total CBT Entries")
+                Spacer()
+                Text("\(cbtStore.entries.count)")
+                    .foregroundColor(AppColors.secondaryText)
+            }
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            settingsForm
+        }
+    }
+    
+    private var settingsForm: some View {
+        Form {
+            developerSection
+            notificationsSection
+            dataManagementSection
+            statisticsSection
+        }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showingImportView) {
-                ImportNotesView()
-                    .environmentObject(store)
+                ImportDataView()
+                    .environmentObject(remindersStore)
+                    .environmentObject(peopleStore)
                     .environmentObject(cbtStore)
             }
             .sheet(isPresented: $showingUIVocabulary) {
@@ -121,10 +147,10 @@ struct SettingsView: View {
             } message: {
                 Text(copyAlertMessage)
             }
-            .alert("Import/Export", isPresented: $store.showImportExportAlert) {
+            .alert("Import/Export", isPresented: $remindersStore.showImportExportAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text(store.importExportMessage)
+                Text(remindersStore.importExportMessage)
             }
             .alert("Delete All Data?", isPresented: $showDeleteAllAlert) {
                 Button("Cancel", role: .cancel) {}
@@ -132,25 +158,32 @@ struct SettingsView: View {
                     deleteAllData()
                 }
             } message: {
-                let totalItems = store.notes.count + store.people.count + cbtStore.entries.count
-                return Text("This will permanently delete ALL data:\n• \(store.notes.count) entries\n• \(store.people.count) people\n• \(cbtStore.entries.count) CBT entries\n\nTotal: \(totalItems) items\n\nThis action cannot be undone.")
+                deleteAllAlertMessage()
             }
             .alert("Import Status", isPresented: $showImportAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(importAlertMessage)
             }
-        }
     }
     
     // MARK: - Export/Import/Delete Functions
     
+    private func deleteAllAlertMessage() -> Text {
+        let remindersCount = remindersStore.reminders.count
+        let peopleCount = peopleStore.people.count
+        let cbtCount = cbtStore.entries.count
+        let totalItems = remindersCount + peopleCount + cbtCount
+        
+        return Text("This will permanently delete ALL data:\n• \(remindersCount) reminders\n• \(peopleCount) people\n• \(cbtCount) CBT entries\n\nTotal: \(totalItems) items\n\nThis action cannot be undone.")
+    }
+    
     private func deleteAllData() {
-        // Delete all entries
-        store.notes.removeAll()
+        // Delete all reminders
+        remindersStore.reminders.removeAll()
         
         // Delete all people
-        store.people.removeAll()
+        peopleStore.people.removeAll()
         
         // Delete all CBT entries
         cbtStore.deleteAllEntries()
@@ -158,8 +191,8 @@ struct SettingsView: View {
     
     private func exportAllData() {
         let completeData = CompleteAppData(
-            entries: store.notes,
-            people: store.people,
+            reminders: remindersStore.reminders,
+            people: peopleStore.people,
             cbtEntries: cbtStore.entries
         )
         
@@ -176,8 +209,11 @@ struct SettingsView: View {
         
         UIPasteboard.general.string = jsonString
         
-        let totalItems = store.notes.count + store.people.count + cbtStore.entries.count
-        copyAlertMessage = "Exported \(totalItems) items (\(store.notes.count) entries, \(store.people.count) people, \(cbtStore.entries.count) CBT) to clipboard"
+        let remindersCount = remindersStore.reminders.count
+        let peopleCount = peopleStore.people.count
+        let cbtCount = cbtStore.entries.count
+        let totalItems = remindersCount + peopleCount + cbtCount
+        copyAlertMessage = "Exported \(totalItems) items (\(remindersCount) reminders, \(peopleCount) people, \(cbtCount) CBT) to clipboard"
         showCopyAlert = true
     }
 }
@@ -196,7 +232,8 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 #Preview {
     SettingsView()
-        .environmentObject(NotesStore())
+        .environmentObject(RemindersStore())
+        .environmentObject(PeopleStore())
         .environmentObject(CBTStore())
         .environmentObject(TodoStore())
 } 

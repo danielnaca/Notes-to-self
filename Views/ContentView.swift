@@ -2,24 +2,26 @@ import SwiftUI
 
 // 📗 Main Content View: Primary interface for the Notes to Self app
 struct ContentView: View {
-    @EnvironmentObject var store: NotesStore
+    @EnvironmentObject var remindersStore: RemindersStore
+    @EnvironmentObject var peopleStore: PeopleStore
     @EnvironmentObject var cbtStore: CBTStore
     @EnvironmentObject var todoStore: TodoStore
     @State private var selectedTab = 0
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            // Tab 1: Entries
-            EntriesView()
-                .environmentObject(store)
+            // Tab 1: Reminders
+            RemindersView()
+                .environmentObject(remindersStore)
                 .tabItem {
                     Image(systemName: "note.text")
-                    Text("Entries")
+                    Text("Reminders")
                 }
                 .tag(0)
             
             // Tab 2: People
             PeopleView()
+                .environmentObject(peopleStore)
                 .tabItem {
                     Image(systemName: "person.2")
                     Text("People")
@@ -40,7 +42,8 @@ struct ContentView: View {
                 get: { selectedTab == 3 },
                 set: { _ in }
             ))
-                .environmentObject(store)
+                .environmentObject(remindersStore)
+                .environmentObject(peopleStore)
                 .tabItem {
                     Image(systemName: "magnifyingglass")
                     Text("Search")
@@ -49,7 +52,8 @@ struct ContentView: View {
             
             // Tab 5: Settings
             SettingsView()
-                .environmentObject(store)
+                .environmentObject(remindersStore)
+                .environmentObject(peopleStore)
                 .environmentObject(cbtStore)
                 .environmentObject(todoStore)
                 .tabItem {
@@ -64,7 +68,8 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(NotesStore())
+        .environmentObject(RemindersStore())
+        .environmentObject(PeopleStore())
         .environmentObject(CBTStore())
         .environmentObject(TodoStore())
 } 

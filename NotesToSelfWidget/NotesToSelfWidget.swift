@@ -9,9 +9,9 @@ import WidgetKit
 import SwiftUI
 import AppIntents
 
-// MARK: - Widget Note Model
-// Note: This is a widget-specific Note struct that matches the main app's structure
-struct WidgetNote: Identifiable, Codable, Equatable {
+// MARK: - Widget Reminder Model
+// Note: This is a widget-specific Reminder struct that matches the main app's structure
+struct WidgetReminder: Identifiable, Codable, Equatable {
     let id: UUID
     let text: String
     let date: Date
@@ -44,9 +44,9 @@ struct WidgetNote: Identifiable, Codable, Equatable {
     }
 }
 
-// MARK: - Main App Note Model (for decoding)
-// This matches the main app's Note struct exactly for decoding compatibility
-struct MainAppNote: Identifiable, Codable, Equatable {
+// MARK: - Main App Reminder Model (for decoding)
+// This matches the main app's ReminderEntry struct exactly for decoding compatibility
+struct MainAppReminder: Identifiable, Codable, Equatable {
     let id: UUID
     let text: String
     let date: Date
@@ -80,163 +80,163 @@ struct MainAppNote: Identifiable, Codable, Equatable {
 }
 
 // MARK: - Shared Model
-struct NotesData: Codable {
-    var notes: [WidgetNote]
+struct RemindersData: Codable {
+    var reminders: [WidgetReminder]
     var currentIndex: Int
 }
 
 let appGroupID = "group.co.uk.cursive.NotesToSelf"
-let notesKey = "notes"
-let indexKey = "currentIndex"
+let remindersKey = "reminders"
+let indexKey = "currentReminderIndex"
 
 // MARK: - App Intent
-struct NextNoteIntent: AppIntent {
-    static var title: LocalizedStringResource = "Next Note"
-    static var description = IntentDescription("Show the next note in the widget.")
+struct NextReminderIntent: AppIntent {
+    static var title: LocalizedStringResource = "Next Reminder"
+    static var description = IntentDescription("Show the next reminder in the widget.")
     
     func perform() async throws -> some IntentResult {
-        print("🔍 Widget: NextNoteIntent triggered")
+        print("🔍 Widget: NextReminderIntent triggered")
         
         guard let ud = UserDefaults(suiteName: appGroupID) else { 
-            print("❌ Widget: Failed to access UserDefaults in NextNoteIntent")
+            print("❌ Widget: Failed to access UserDefaults in NextReminderIntent")
             return .result() 
         }
         
-        let notes: [WidgetNote]
-        if let data = ud.data(forKey: notesKey) {
-            print("📊 Widget: Found data in NextNoteIntent, size: \(data.count) bytes")
+        let reminders: [WidgetReminder]
+        if let data = ud.data(forKey: remindersKey) {
+            print("📊 Widget: Found data in NextReminderIntent, size: \(data.count) bytes")
             
-            // Try to decode as WidgetNote first
-            if let decoded = try? JSONDecoder().decode([WidgetNote].self, from: data) {
-                notes = decoded
-                print("✅ Widget: NextNoteIntent decoded \(decoded.count) WidgetNote objects")
+            // Try to decode as WidgetReminder first
+            if let decoded = try? JSONDecoder().decode([WidgetReminder].self, from: data) {
+                reminders = decoded
+                print("✅ Widget: NextReminderIntent decoded \(decoded.count) WidgetReminder objects")
             } else {
-                print("⚠️ Widget: NextNoteIntent failed to decode as WidgetNote, trying Note...")
+                print("⚠️ Widget: NextReminderIntent failed to decode as WidgetReminder, trying MainAppReminder...")
                 
-                // Try to decode as MainAppNote (from main app) and convert
-                if let mainAppNotes = try? JSONDecoder().decode([MainAppNote].self, from: data) {
-                    print("✅ Widget: NextNoteIntent decoded \(mainAppNotes.count) MainAppNote objects from main app")
-                    // Convert MainAppNote to WidgetNote
-                    notes = mainAppNotes.map { note in
-                        WidgetNote(
-                            id: note.id,
-                            text: note.text,
-                            date: note.date,
-                            lastModified: note.lastModified
+                // Try to decode as MainAppReminder (from main app) and convert
+                if let mainAppReminders = try? JSONDecoder().decode([MainAppReminder].self, from: data) {
+                    print("✅ Widget: NextReminderIntent decoded \(mainAppReminders.count) MainAppReminder objects from main app")
+                    // Convert MainAppReminder to WidgetReminder
+                    reminders = mainAppReminders.map { reminder in
+                        WidgetReminder(
+                            id: reminder.id,
+                            text: reminder.text,
+                            date: reminder.date,
+                            lastModified: reminder.lastModified
                         )
                     }
-                    print("✅ Widget: NextNoteIntent converted to \(notes.count) WidgetNote objects")
+                    print("✅ Widget: NextReminderIntent converted to \(reminders.count) WidgetReminder objects")
                 } else {
-                    print("❌ Widget: NextNoteIntent failed to decode as MainAppNote either")
-                    notes = []
+                    print("❌ Widget: NextReminderIntent failed to decode as MainAppReminder either")
+                    reminders = []
                 }
             }
         } else {
-            print("❌ Widget: NextNoteIntent no data found for key: \(notesKey)")
-            notes = []
+            print("❌ Widget: NextReminderIntent no data found for key: \(remindersKey)")
+            reminders = []
         }
         
-        guard !notes.isEmpty else { 
-            print("❌ Widget: NextNoteIntent no notes available")
+        guard !reminders.isEmpty else { 
+            print("❌ Widget: NextReminderIntent no reminders available")
             return .result() 
         }
         
         var idx = ud.integer(forKey: indexKey)
-        print("📊 Widget: NextNoteIntent current index: \(idx), notes count: \(notes.count)")
+        print("📊 Widget: NextReminderIntent current index: \(idx), reminders count: \(reminders.count)")
         
-        idx = (idx + 1) % notes.count
+        idx = (idx + 1) % reminders.count
         ud.set(idx, forKey: indexKey)
-        print("✅ Widget: NextNoteIntent updated index to: \(idx)")
+        print("✅ Widget: NextReminderIntent updated index to: \(idx)")
         
         WidgetCenter.shared.reloadAllTimelines()
-        print("✅ Widget: NextNoteIntent reloaded widget timelines")
+        print("✅ Widget: NextReminderIntent reloaded widget timelines")
         
         return .result()
     }
 }
 
 // MARK: - Timeline Provider
-struct NotesProvider: TimelineProvider {
-    func placeholder(in context: Context) -> NotesEntry {
-        NotesEntry(date: Date(), note: WidgetNote(id: UUID(), text: "Sample note", date: Date(), lastModified: Date()))
+struct RemindersProvider: TimelineProvider {
+    func placeholder(in context: Context) -> RemindersEntry {
+        RemindersEntry(date: Date(), reminder: WidgetReminder(id: UUID(), text: "Sample reminder", date: Date(), lastModified: Date()))
     }
-    func getSnapshot(in context: Context, completion: @escaping (NotesEntry) -> Void) {
+    func getSnapshot(in context: Context, completion: @escaping (RemindersEntry) -> Void) {
         let entry = loadEntry()
         completion(entry)
     }
-    func getTimeline(in context: Context, completion: @escaping (Timeline<NotesEntry>) -> Void) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<RemindersEntry>) -> Void) {
         let entry = loadEntry()
         let timeline = Timeline(entries: [entry], policy: .never)
         completion(timeline)
     }
-    private func loadEntry() -> NotesEntry {
+    private func loadEntry() -> RemindersEntry {
         print("🔍 Widget: Starting loadEntry()")
         
         guard let ud = UserDefaults(suiteName: appGroupID) else {
             print("❌ Widget: Failed to access UserDefaults with appGroupID: \(appGroupID)")
-            return NotesEntry(date: Date(), note: WidgetNote(id: UUID(), text: "❌ No UserDefaults access", date: Date(), lastModified: Date()))
+            return RemindersEntry(date: Date(), reminder: WidgetReminder(id: UUID(), text: "❌ No UserDefaults access", date: Date(), lastModified: Date()))
         }
         
         print("✅ Widget: UserDefaults accessed successfully")
         
-        let notes: [WidgetNote]
-        if let data = ud.data(forKey: notesKey) {
+        let reminders: [WidgetReminder]
+        if let data = ud.data(forKey: remindersKey) {
             print("📊 Widget: Found data, size: \(data.count) bytes")
             
-            // Try to decode as WidgetNote first
-            if let decoded = try? JSONDecoder().decode([WidgetNote].self, from: data) {
-                notes = decoded
-                print("✅ Widget: Successfully decoded \(decoded.count) WidgetNote objects")
+            // Try to decode as WidgetReminder first
+            if let decoded = try? JSONDecoder().decode([WidgetReminder].self, from: data) {
+                reminders = decoded
+                print("✅ Widget: Successfully decoded \(decoded.count) WidgetReminder objects")
             } else {
-                print("⚠️ Widget: Failed to decode as WidgetNote, trying Note...")
+                print("⚠️ Widget: Failed to decode as WidgetReminder, trying MainAppReminder...")
                 
-                // Try to decode as MainAppNote (from main app) and convert
-                if let mainAppNotes = try? JSONDecoder().decode([MainAppNote].self, from: data) {
-                    print("✅ Widget: Successfully decoded \(mainAppNotes.count) MainAppNote objects from main app")
-                    // Convert MainAppNote to WidgetNote
-                    notes = mainAppNotes.map { note in
-                        WidgetNote(
-                            id: note.id,
-                            text: note.text,
-                            date: note.date,
-                            lastModified: note.lastModified
+                // Try to decode as MainAppReminder (from main app) and convert
+                if let mainAppReminders = try? JSONDecoder().decode([MainAppReminder].self, from: data) {
+                    print("✅ Widget: Successfully decoded \(mainAppReminders.count) MainAppReminder objects from main app")
+                    // Convert MainAppReminder to WidgetReminder
+                    reminders = mainAppReminders.map { reminder in
+                        WidgetReminder(
+                            id: reminder.id,
+                            text: reminder.text,
+                            date: reminder.date,
+                            lastModified: reminder.lastModified
                         )
                     }
-                    print("✅ Widget: Converted to \(notes.count) WidgetNote objects")
+                    print("✅ Widget: Converted to \(reminders.count) WidgetReminder objects")
                 } else {
-                    print("❌ Widget: Failed to decode as MainAppNote either")
-                    notes = []
+                    print("❌ Widget: Failed to decode as MainAppReminder either")
+                    reminders = []
                 }
             }
         } else {
-            print("❌ Widget: No data found for key: \(notesKey)")
-            notes = []
+            print("❌ Widget: No data found for key: \(remindersKey)")
+            reminders = []
         }
         
         let idx = ud.integer(forKey: indexKey)
-        print("📊 Widget: Current index: \(idx), Notes count: \(notes.count)")
+        print("📊 Widget: Current index: \(idx), Reminders count: \(reminders.count)")
         
-        let note = (!notes.isEmpty && idx < notes.count) ? notes[idx] : WidgetNote(id: UUID(), text: "No notes available", date: Date(), lastModified: Date())
-        print("📝 Widget: Selected note text: '\(note.text)'")
+        let reminder = (!reminders.isEmpty && idx < reminders.count) ? reminders[idx] : WidgetReminder(id: UUID(), text: "No reminders available", date: Date(), lastModified: Date())
+        print("📝 Widget: Selected reminder text: '\(reminder.text)'")
         
-        return NotesEntry(date: Date(), note: note)
+        return RemindersEntry(date: Date(), reminder: reminder)
     }
 }
 
-struct NotesEntry: TimelineEntry {
+struct RemindersEntry: TimelineEntry {
     let date: Date
-    let note: WidgetNote
+    let reminder: WidgetReminder
 }
 
 // MARK: - Widget
 struct NotesToSelfWidgetEntryView: View {
-    var entry: NotesEntry
+    var entry: RemindersEntry
     @Environment(\.widgetFamily) var widgetFamily
     
     var body: some View {
         ZStack {
             // Text content
-            Text(entry.note.text)
+            Text(entry.reminder.text)
                 .foregroundColor(AppColors.widgetText)
                 .font(widgetFamily == .systemSmall ? AppTypography.widgetSmallFont : AppTypography.widgetLargeFont)
                 .multilineTextAlignment(.center)
@@ -245,7 +245,7 @@ struct NotesToSelfWidgetEntryView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .padding(AppPadding.widgetTextPadding)
                 .transition(.identity)
-                .id(entry.note.id)
+                .id(entry.reminder.id)
             
             // Button aligned to bottom-right corner
             VStack {
@@ -253,7 +253,7 @@ struct NotesToSelfWidgetEntryView: View {
                 HStack {
                     Spacer()
                     ZStack {
-                        Button(intent: NextNoteIntent()) {
+                        Button(intent: NextReminderIntent()) {
                             Circle()
                                 .fill(AppColors.widgetButtonInvisible)
                                 .frame(width: AppDimensions.widgetButtonInvisibleSize, height: AppDimensions.widgetButtonInvisibleSize)
@@ -286,7 +286,7 @@ struct NotesToSelfWidgetEntryView: View {
 
 struct NotesToSelfWidgetEntryView_Previews: PreviewProvider {
     static var previews: some View {
-        NotesToSelfWidgetEntryView(entry: NotesEntry(date: .now, note: WidgetNote(id: UUID(), text: "Preview note", date: .now, lastModified: .now)))
+        NotesToSelfWidgetEntryView(entry: RemindersEntry(date: .now, reminder: WidgetReminder(id: UUID(), text: "Preview reminder", date: .now, lastModified: .now)))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }
@@ -295,11 +295,11 @@ struct NotesToSelfWidgetEntryView_Previews: PreviewProvider {
 struct NotesToSelfWidget: Widget {
     let kind: String = "NotesToSelfWidget"
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: NotesProvider()) { entry in
+        StaticConfiguration(kind: kind, provider: RemindersProvider()) { entry in
             NotesToSelfWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Notes to Self")
-        .description("View your saved notes and cycle through them.")
+        .description("View your saved reminders and cycle through them.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }

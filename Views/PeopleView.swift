@@ -9,13 +9,13 @@ import SwiftUI
 
 // 📗 People View: List view of entries with edit functionality
 struct PeopleView: View {
-    @EnvironmentObject var store: NotesStore
+    @EnvironmentObject var store: PeopleStore
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
                 // New entry button
-                NavigationLink(destination: PeopleEditView(note: Note(text: "")).environmentObject(store)) {
+                NavigationLink(destination: PeopleEditView(person: PersonEntry(text: "")).environmentObject(store)) {
                     HStack {
                         Text("New")
                             .font(.headline)
@@ -48,9 +48,9 @@ struct PeopleView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    List(store.people) { note in
-                        NavigationLink(destination: PeopleEditView(note: note).environmentObject(store)) {
-                            PeopleRowView(note: note)
+                    List(store.people) { person in
+                        NavigationLink(destination: PeopleEditView(person: person).environmentObject(store)) {
+                            PeopleRowView(person: person)
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -66,12 +66,12 @@ struct PeopleView: View {
 
 // 📗 People Row View: Individual row showing entry title
 struct PeopleRowView: View {
-    let note: Note
+    let person: PersonEntry
     
     private var title: String {
         // Get first line of text as title
-        let lines = note.text.components(separatedBy: .newlines)
-        return lines.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? note.text
+        let lines = person.text.components(separatedBy: .newlines)
+        return lines.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? person.text
     }
     
     var body: some View {
@@ -87,6 +87,6 @@ struct PeopleRowView: View {
 
 #Preview {
     PeopleView()
-        .environmentObject(NotesStore())
+        .environmentObject(PeopleStore())
 }
 

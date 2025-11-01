@@ -1,7 +1,7 @@
 import Foundation
 
-// 📗 Note Entry: Individual note data structure
-struct Note: Identifiable, Codable, Equatable {
+// 📗 Reminder Entry: Individual reminder data structure
+struct ReminderEntry: Identifiable, Codable, Equatable, Hashable {
     let id: UUID
     let text: String
     let date: Date
@@ -32,4 +32,5 @@ struct Note: Identifiable, Codable, Equatable {
             self.lastModified = date
         }
     }
-} 
+}
+

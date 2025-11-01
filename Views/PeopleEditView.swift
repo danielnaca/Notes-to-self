@@ -9,21 +9,21 @@ import SwiftUI
 
 // 📗 People Edit View: Navigation-style edit interface for people entries
 struct PeopleEditView: View {
-    @EnvironmentObject var store: NotesStore
+    @EnvironmentObject var store: PeopleStore
     @Environment(\.dismiss) private var dismiss
-    let note: Note
+    let person: PersonEntry
     @State private var editedText: String
     
-    init(note: Note) {
-        self.note = note
-        self._editedText = State(initialValue: note.text)
+    init(person: PersonEntry) {
+        self.person = person
+        self._editedText = State(initialValue: person.text)
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Date info section
             VStack(alignment: .leading, spacing: 8) {
-                Text("Created: \(DateFormatter.peopleFormatter.string(from: note.date))")
+                Text("Created: \(DateFormatter.peopleFormatter.string(from: person.date))")
                     .font(.caption)
                     .foregroundColor(AppColors.secondaryText)
                     .padding(.horizontal)
@@ -37,7 +37,7 @@ struct PeopleEditView: View {
             Spacer()
         }
         .background(AppColors.background)
-        .navigationTitle(note.text.isEmpty ? "New Person" : "Edit Person")
+        .navigationTitle(person.text.isEmpty ? "New Person" : "Edit Person")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -55,24 +55,24 @@ struct PeopleEditView: View {
         let trimmedText = editedText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else { return }
         
-        if let index = store.people.firstIndex(where: { $0.id == note.id }) {
+        if let index = store.people.firstIndex(where: { $0.id == person.id }) {
             // Update existing person
-            let updatedNote = Note(
-                id: note.id,
+            let updatedPerson = PersonEntry(
+                id: person.id,
                 text: trimmedText,
-                date: note.date,
+                date: person.date,
                 lastModified: Date()
             )
-            store.people[index] = updatedNote
+            store.people[index] = updatedPerson
         } else {
             // Add new person (for + button created entries)
-            let newNote = Note(
-                id: note.id,
+            let newPerson = PersonEntry(
+                id: person.id,
                 text: trimmedText,
                 date: Date(),
                 lastModified: Date()
             )
-            store.people.insert(newNote, at: 0)
+            store.people.insert(newPerson, at: 0)
         }
     }
 }
@@ -161,8 +161,8 @@ extension DateFormatter {
 
 #Preview {
     NavigationView {
-        PeopleEditView(note: Note(text: "Sample person"))
-            .environmentObject(NotesStore())
+        PeopleEditView(person: PersonEntry(text: "Sample person"))
+            .environmentObject(PeopleStore())
     }
 }
 

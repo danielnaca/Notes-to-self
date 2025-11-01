@@ -1,5 +1,5 @@
 //
-//  ImportNotesView.swift
+//  ImportDataView.swift
 //  Notes to self
 //
 //  Created by AI Assistant on 9/30/25.
@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-// 📗 Import Notes View: Paste-based JSON import interface
-struct ImportNotesView: View {
-    @EnvironmentObject var store: NotesStore
+// 📗 Import Data View: Paste-based JSON import interface
+struct ImportDataView: View {
+    @EnvironmentObject var remindersStore: RemindersStore
+    @EnvironmentObject var peopleStore: PeopleStore
     @EnvironmentObject var cbtStore: CBTStore
     @Environment(\.dismiss) private var dismiss
     @State private var pastedJSON: String = ""
@@ -128,7 +129,7 @@ struct ImportNotesView: View {
                 }
             } message: {
                 if let data = validatedData {
-                    Text("This will overwrite all existing data with:\n\n\(data.entries.count) entries\n\(data.people.count) people\n\(data.cbtEntries.count) CBT entries\n\nExported on: \(formatDate(data.exportDate))")
+                    Text("This will overwrite all existing data with:\n\n\(data.reminders.count) reminders\n\(data.people.count) people\n\(data.cbtEntries.count) CBT entries\n\nExported on: \(formatDate(data.exportDate))")
                 }
             }
         }
@@ -178,12 +179,12 @@ struct ImportNotesView: View {
         guard let completeData = validatedData else { return }
         
         // Now we actually overwrite the data (only after user confirms)
-        store.notes = completeData.entries
-        store.people = completeData.people
+        remindersStore.reminders = completeData.reminders
+        peopleStore.people = completeData.people
         cbtStore.entries = completeData.cbtEntries
         
-        let totalItems = completeData.entries.count + completeData.people.count + completeData.cbtEntries.count
-        alertMessage = "Successfully imported \(totalItems) items:\n• \(completeData.entries.count) entries\n• \(completeData.people.count) people\n• \(completeData.cbtEntries.count) CBT entries"
+        let totalItems = completeData.reminders.count + completeData.people.count + completeData.cbtEntries.count
+        alertMessage = "Successfully imported \(totalItems) items:\n• \(completeData.reminders.count) reminders\n• \(completeData.people.count) people\n• \(completeData.cbtEntries.count) CBT entries"
         showAlert = true
         validatedData = nil
     }
@@ -197,8 +198,9 @@ struct ImportNotesView: View {
 }
 
 #Preview {
-    ImportNotesView()
-        .environmentObject(NotesStore())
+    ImportDataView()
+        .environmentObject(RemindersStore())
+        .environmentObject(PeopleStore())
         .environmentObject(CBTStore())
 }
 
