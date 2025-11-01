@@ -76,7 +76,7 @@ struct EntriesView: View {
                             }
                         }
                     )
-                    .onChange(of: store.notes.count) { _ in
+                    .onChange(of: store.notes.count) { _, _ in
                         // Scroll to bottom when new entry is added
                         if let lastNote = store.notes.first {
                             withAnimation {

@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var store: NotesStore
     @EnvironmentObject var cbtStore: CBTStore
+    @EnvironmentObject var todoStore: TodoStore
     @State private var selectedTab = 0
     
     var body: some View {
@@ -50,6 +51,7 @@ struct ContentView: View {
             SettingsView()
                 .environmentObject(store)
                 .environmentObject(cbtStore)
+                .environmentObject(todoStore)
                 .tabItem {
                     Image(systemName: "gearshape")
                     Text("Settings")
@@ -64,4 +66,5 @@ struct ContentView: View {
     ContentView()
         .environmentObject(NotesStore())
         .environmentObject(CBTStore())
+        .environmentObject(TodoStore())
 } 

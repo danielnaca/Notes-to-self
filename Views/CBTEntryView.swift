@@ -37,7 +37,7 @@ struct CBTEntryView: View {
                     TextField("What happened? How did you feel?", text: $entry.situation, axis: .vertical)
                         .textFieldStyle(.plain)
                         .lineLimit(1...10)
-                        .onChange(of: entry.situation) { _ in
+                        .onChange(of: entry.situation) { _, _ in
                             autosave()
                         }
                 }
@@ -75,7 +75,7 @@ struct CBTEntryView: View {
                     TextField("What evidence contradicts this thought?", text: $entry.challenge, axis: .vertical)
                         .textFieldStyle(.plain)
                         .lineLimit(1...10)
-                        .onChange(of: entry.challenge) { _ in
+                        .onChange(of: entry.challenge) { _, _ in
                             autosave()
                         }
                 }
@@ -89,7 +89,7 @@ struct CBTEntryView: View {
                     TextField("What's a more balanced perspective?", text: $entry.alternative, axis: .vertical)
                         .textFieldStyle(.plain)
                         .lineLimit(1...10)
-                        .onChange(of: entry.alternative) { _ in
+                        .onChange(of: entry.alternative) { _, _ in
                             autosave()
                         }
                 }
@@ -103,7 +103,7 @@ struct CBTEntryView: View {
                     TextField("Additional observations...", text: $entry.notes, axis: .vertical)
                         .textFieldStyle(.plain)
                         .lineLimit(1...10)
-                        .onChange(of: entry.notes) { _ in
+                        .onChange(of: entry.notes) { _, _ in
                             autosave()
                         }
                 }

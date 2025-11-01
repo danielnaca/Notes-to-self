@@ -26,29 +26,29 @@ struct CompleteAppData: Codable {
 struct SettingsView: View {
     @EnvironmentObject var store: NotesStore
     @EnvironmentObject var cbtStore: CBTStore
+    @EnvironmentObject var todoStore: TodoStore
     @State private var notificationsPerWeek: Double = 2
     @State private var notificationsEnabled: Bool = true
     @State private var showingImportView = false
     @State private var showCopyAlert = false
     @State private var copyAlertMessage = ""
-    @State private var showDeleteCBTAlert = false
+    @State private var showDeleteAllAlert = false
     @State private var showImportAlert = false
     @State private var importAlertMessage = ""
+    @State private var showingUIVocabulary = false
+    @State private var showingTodoList = false
     
     var body: some View {
         NavigationView {
             Form {
-                Section("UI Vocabulary") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Input Bar: Bottom text field area with send button")
-                            .font(.caption)
-                        Text("Message Bubble: Individual entry in the list")
-                            .font(.caption)
-                        Text("Messages Area: Scrollable section showing all entries")
-                            .font(.caption)
+                Section("Developer") {
+                    Button("UI Vocabulary") {
+                        showingUIVocabulary = true
                     }
-                    .foregroundColor(AppColors.secondaryText)
-                    .padding(.vertical, 4)
+                    
+                    Button("Todo List") {
+                        showingTodoList = true
+                    }
                 }
                 
                 Section("Notifications") {
@@ -72,11 +72,11 @@ struct SettingsView: View {
                         showingImportView = true
                     }
                     
-                    Button("Delete All CBT Entries") {
-                        showDeleteCBTAlert = true
+                    Button("Delete All Data") {
+                        showDeleteAllAlert = true
                     }
                     .foregroundColor(.red)
-                    .disabled(cbtStore.entries.isEmpty)
+                    .disabled(store.notes.isEmpty && store.people.isEmpty && cbtStore.entries.isEmpty)
                 }
                 
                 Section("Statistics") {
@@ -109,6 +109,13 @@ struct SettingsView: View {
                     .environmentObject(store)
                     .environmentObject(cbtStore)
             }
+            .sheet(isPresented: $showingUIVocabulary) {
+                UIVocabularyView()
+            }
+            .sheet(isPresented: $showingTodoList) {
+                TodoListView()
+                    .environmentObject(todoStore)
+            }
             .alert("Copied", isPresented: $showCopyAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -119,13 +126,14 @@ struct SettingsView: View {
             } message: {
                 Text(store.importExportMessage)
             }
-            .alert("Delete All CBT Entries?", isPresented: $showDeleteCBTAlert) {
+            .alert("Delete All Data?", isPresented: $showDeleteAllAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Delete All", role: .destructive) {
-                    cbtStore.deleteAllEntries()
+                    deleteAllData()
                 }
             } message: {
-                Text("This will permanently delete all \(cbtStore.entries.count) CBT entries. This action cannot be undone.")
+                let totalItems = store.notes.count + store.people.count + cbtStore.entries.count
+                return Text("This will permanently delete ALL data:\n• \(store.notes.count) entries\n• \(store.people.count) people\n• \(cbtStore.entries.count) CBT entries\n\nTotal: \(totalItems) items\n\nThis action cannot be undone.")
             }
             .alert("Import Status", isPresented: $showImportAlert) {
                 Button("OK", role: .cancel) {}
@@ -135,7 +143,18 @@ struct SettingsView: View {
         }
     }
     
-    // MARK: - Export/Import Functions
+    // MARK: - Export/Import/Delete Functions
+    
+    private func deleteAllData() {
+        // Delete all entries
+        store.notes.removeAll()
+        
+        // Delete all people
+        store.people.removeAll()
+        
+        // Delete all CBT entries
+        cbtStore.deleteAllEntries()
+    }
     
     private func exportAllData() {
         let completeData = CompleteAppData(
@@ -179,4 +198,5 @@ struct ShareSheet: UIViewControllerRepresentable {
     SettingsView()
         .environmentObject(NotesStore())
         .environmentObject(CBTStore())
+        .environmentObject(TodoStore())
 } 

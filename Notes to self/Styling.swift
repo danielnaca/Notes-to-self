@@ -47,8 +47,8 @@ struct AppDimensions {
     static let textFieldBorderWidth: CGFloat = 1
     
     // ----- NotesToSelfWidget.swift -----
-    static let widgetButtonInvisibleSize: CGFloat = 36
-    static let widgetButtonVisibleSize: CGFloat = 30
+    static let widgetButtonInvisibleSize: CGFloat = 80  // Large tap target for easier tapping
+    static let widgetButtonVisibleSize: CGFloat = 60  // Doubled for visibility
 }
 
 // MARK: - Padding
@@ -84,7 +84,6 @@ struct AppTypography {
     static let bodyFont = Font.body
     
     // ----- NotesToSelfWidget.swift -----
-    static let widgetSmallFont = Font.caption
-    static let widgetLargeFont = Font.body
-    static let widgetDateTimeFont = Font.caption2
+    static let widgetSmallFont = Font.system(size: 16)
+    static let widgetLargeFont = Font.system(size: 16)
 } 

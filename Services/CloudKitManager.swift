@@ -150,8 +150,8 @@ class CloudKitManager {
     }
     
     private func recordToNote(_ record: CKRecord) -> Note? {
-        let idString = record.recordID.recordName
-        guard let id = UUID(uuidString: idString),
+        guard let idString = record.recordID.recordName,
+              let id = UUID(uuidString: idString),
               let text = record["text"] as? String,
               let date = record["date"] as? Date,
               let lastModified = record["lastModified"] as? Date else {
@@ -180,8 +180,8 @@ class CloudKitManager {
     }
     
     private func recordToCBTEntry(_ record: CKRecord) -> CBTEntry? {
-        let idString = record.recordID.recordName
-        guard let id = UUID(uuidString: idString),
+        guard let idString = record.recordID.recordName,
+              let id = UUID(uuidString: idString),
               let situation = record["situation"] as? String,
               let challenge = record["challenge"] as? String,
               let alternative = record["alternative"] as? String,

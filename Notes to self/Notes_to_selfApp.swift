@@ -13,6 +13,7 @@ import UserNotifications
 struct Notes_to_selfApp: App {
     @StateObject private var store = NotesStore()
     @StateObject private var cbtStore = CBTStore()
+    @StateObject private var todoStore = TodoStore()
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
@@ -20,6 +21,7 @@ struct Notes_to_selfApp: App {
             ContentView()
                 .environmentObject(store)
                 .environmentObject(cbtStore)
+                .environmentObject(todoStore)
                 .onAppear {
                     print("📱 App appeared - NotesStore created")
                     store.refreshNotificationQueue()

@@ -233,59 +233,50 @@ struct NotesToSelfWidgetEntryView: View {
     var entry: NotesEntry
     @Environment(\.widgetFamily) var widgetFamily
     
-    private var currentDateTimeString: String {
-        let formatter = DateFormatter()
-        formatter.timeZone = TimeZone(identifier: "GMT+1")
-        formatter.dateFormat = "M/d — HH:mm"
-        return formatter.string(from: Date())
-    }
-    
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Text content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(entry.note.text)
-                        .foregroundColor(AppColors.widgetText)
-                        .font(widgetFamily == .systemSmall ? AppTypography.widgetSmallFont : AppTypography.widgetLargeFont)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(nil)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                    
-                    // Debug info
-                    Text("Debug: \(entry.note.text.prefix(20))...")
-                        .font(.caption2)
-                        .foregroundColor(AppColors.widgetText.opacity(0.7))
-                        .lineLimit(1)
-                }
+        ZStack {
+            // Text content
+            Text(entry.note.text)
+                .foregroundColor(AppColors.widgetText)
+                .font(widgetFamily == .systemSmall ? AppTypography.widgetSmallFont : AppTypography.widgetLargeFont)
+                .multilineTextAlignment(.center)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .padding(AppPadding.widgetTextPadding)
-                
-                // Button absolutely positioned at bottom-right corner
-                ZStack {
-                    Button(intent: NextNoteIntent()) {
-                        Circle()
-                            .fill(AppColors.widgetButtonInvisible)
-                            .frame(width: AppDimensions.widgetButtonInvisibleSize, height: AppDimensions.widgetButtonInvisibleSize)
-                    }
-                    .opacity(0.01)
-                    Circle()
-                        .fill(AppColors.widgetButtonVisible)
-                        .frame(width: AppDimensions.widgetButtonVisibleSize, height: AppDimensions.widgetButtonVisibleSize)
-                        .overlay(
-                            Circle()
-                                .stroke(AppColors.widgetButtonBorder, lineWidth: 1)
-                        )
-                }
-                .position(x: geometry.size.width, y: geometry.size.height)
-                
-                // Date/time text at bottom
-                VStack {
+                .transition(.identity)
+                .id(entry.note.id)
+            
+            // Button aligned to bottom-right corner
+            VStack {
+                Spacer()
+                HStack {
                     Spacer()
-                    Text(currentDateTimeString)
-                        .font(AppTypography.widgetDateTimeFont)
-                        .foregroundColor(AppColors.widgetText)
-                        .padding(.bottom, 4)
+                    ZStack {
+                        Button(intent: NextNoteIntent()) {
+                            Circle()
+                                .fill(AppColors.widgetButtonInvisible)
+                                .frame(width: AppDimensions.widgetButtonInvisibleSize, height: AppDimensions.widgetButtonInvisibleSize)
+                        }
+                        .opacity(0.01)
+                        
+                        // Visible button with arrow
+                        ZStack {
+                            Circle()
+                                .fill(Color.clear)
+                                .frame(width: AppDimensions.widgetButtonVisibleSize, height: AppDimensions.widgetButtonVisibleSize)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.clear, lineWidth: 2)
+                                )
+                                .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+                            
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .offset(x: 40, y: 45)
                 }
             }
         }

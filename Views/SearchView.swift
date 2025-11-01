@@ -129,7 +129,7 @@ struct SearchView: View {
             .task {
                 setupKeyboardObservers()
             }
-            .onChange(of: isActive) { active in
+            .onChange(of: isActive) { _, active in
                 if active {
                     // Focus when search tab becomes active
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {

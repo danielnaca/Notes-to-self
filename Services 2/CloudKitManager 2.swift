@@ -18,6 +18,7 @@ class CloudKitManager {
     // Record type names
     private let noteRecordType = "Note"
     private let cbtEntryRecordType = "CBTEntry"
+    private let todoRecordType = "TodoItem"
     
     private init() {
         container = CKContainer.default()
@@ -150,8 +151,8 @@ class CloudKitManager {
     }
     
     private func recordToNote(_ record: CKRecord) -> Note? {
-        guard let idString = record.recordID.recordName,
-              let id = UUID(uuidString: idString),
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
               let text = record["text"] as? String,
               let date = record["date"] as? Date,
               let lastModified = record["lastModified"] as? Date else {
@@ -180,8 +181,8 @@ class CloudKitManager {
     }
     
     private func recordToCBTEntry(_ record: CKRecord) -> CBTEntry? {
-        guard let idString = record.recordID.recordName,
-              let id = UUID(uuidString: idString),
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
               let situation = record["situation"] as? String,
               let challenge = record["challenge"] as? String,
               let alternative = record["alternative"] as? String,
@@ -206,6 +207,74 @@ class CloudKitManager {
             notes: notes,
             date: date,
             lastModified: lastModified
+        )
+    }
+    
+    // MARK: - Todo Operations
+    
+    func saveTodos(_ todos: [TodoItem]) async throws {
+        let records = todos.map { todoToRecord($0) }
+        
+        let batchSize = 400
+        for i in stride(from: 0, to: records.count, by: batchSize) {
+            let batch = Array(records[i..<min(i + batchSize, records.count)])
+            let (saveResults, _) = try await privateDatabase.modifyRecords(saving: batch, deleting: [])
+            
+            for (_, result) in saveResults {
+                if case .failure(let error) = result {
+                    print("Error saving todo: \(error)")
+                }
+            }
+        }
+    }
+    
+    func fetchTodos() async throws -> [TodoItem] {
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: todoRecordType, predicate: predicate)
+        query.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        
+        let results = try await privateDatabase.records(matching: query)
+        
+        var todos: [TodoItem] = []
+        for (_, result) in results.matchResults {
+            switch result {
+            case .success(let record):
+                if let todo = recordToTodo(record) {
+                    todos.append(todo)
+                }
+            case .failure(let error):
+                print("Error fetching todo: \(error)")
+            }
+        }
+        
+        return todos
+    }
+    
+    private func todoToRecord(_ todo: TodoItem) -> CKRecord {
+        let recordID = CKRecord.ID(recordName: todo.id.uuidString)
+        let record = CKRecord(recordType: todoRecordType, recordID: recordID)
+        
+        record["text"] = todo.text as CKRecordValue
+        record["isCompleted"] = (todo.isCompleted ? 1 : 0) as CKRecordValue
+        record["date"] = todo.date as CKRecordValue
+        
+        return record
+    }
+    
+    private func recordToTodo(_ record: CKRecord) -> TodoItem? {
+        let idString = record.recordID.recordName
+        guard let id = UUID(uuidString: idString),
+              let text = record["text"] as? String,
+              let isCompletedInt = record["isCompleted"] as? Int,
+              let date = record["date"] as? Date else {
+            return nil
+        }
+        
+        return TodoItem(
+            id: id,
+            text: text,
+            isCompleted: isCompletedInt == 1,
+            date: date
         )
     }
     

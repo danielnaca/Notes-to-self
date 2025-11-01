@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import CloudKit
 
 // 📗 CBT Store: Manages CBT entries with autosave
 class CBTStore: ObservableObject {
@@ -16,9 +17,11 @@ class CBTStore: ObservableObject {
     
     private let appGroupID = "group.co.uk.cursive.NotesToSelf"
     private let entriesKey = "cbtEntries"
+    private let cloudKit = CloudKitManager.shared
+    private var isSyncing = false
     
     init() {
-        load()
+        loadFromCloudKit()
     }
     
     // MARK: - Mock Data Generation (Development Only)
@@ -86,7 +89,7 @@ class CBTStore: ObservableObject {
         ]
         
         // Generate 50 entries over past 120 days
-        for i in 0..<50 {
+        for _ in 0..<50 {
             let daysAgo = Int.random(in: 0...120)
             let hoursOffset = Int.random(in: 0...23)
             let minutesOffset = Int.random(in: 0...59)
@@ -135,6 +138,15 @@ class CBTStore: ObservableObject {
     }
     
     func deleteAllEntries() {
+        Task {
+            do {
+                if await cloudKit.isCloudKitAvailable() {
+                    try await cloudKit.deleteAllCBTEntries()
+                }
+            } catch {
+                print("Error deleting all CBT entries from CloudKit: \(error)")
+            }
+        }
         entries.removeAll()
     }
     
@@ -144,18 +156,77 @@ class CBTStore: ObservableObject {
         }
     }
     
-    private func save() {
-        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
-        if let data = try? JSONEncoder().encode(entries) {
-            ud.set(data, forKey: entriesKey)
+    // MARK: - CloudKit Sync Methods
+    
+    private func loadFromCloudKit() {
+        Task {
+            do {
+                // Check if CloudKit is available
+                guard await cloudKit.isCloudKitAvailable() else {
+                    print("CloudKit not available, loading from UserDefaults fallback")
+                    await MainActor.run {
+                        loadFromUserDefaults()
+                    }
+                    return
+                }
+                
+                // Fetch from CloudKit
+                let fetchedEntries = try await cloudKit.fetchCBTEntries()
+                
+                await MainActor.run {
+                    isSyncing = true
+                    self.entries = fetchedEntries
+                    isSyncing = false
+                    print("Loaded \(fetchedEntries.count) CBT entries from CloudKit")
+                }
+            } catch {
+                print("Error loading from CloudKit: \(error)")
+                await MainActor.run {
+                    loadFromUserDefaults()
+                }
+            }
         }
     }
     
-    private func load() {
+    private func save() {
+        guard !isSyncing else { return }
+        
+        Task {
+            do {
+                guard await cloudKit.isCloudKitAvailable() else {
+                    print("CloudKit not available, saving to UserDefaults fallback")
+                    await MainActor.run {
+                        saveToUserDefaults()
+                    }
+                    return
+                }
+                
+                try await cloudKit.saveCBTEntries(entries)
+                print("Saved \(entries.count) CBT entries to CloudKit")
+            } catch {
+                print("Error saving to CloudKit: \(error)")
+                await MainActor.run {
+                    saveToUserDefaults()
+                }
+            }
+        }
+    }
+    
+    // MARK: - UserDefaults Fallback
+    
+    private func loadFromUserDefaults() {
         guard let ud = UserDefaults(suiteName: appGroupID) else { return }
         if let data = ud.data(forKey: entriesKey),
            let decoded = try? JSONDecoder().decode([CBTEntry].self, from: data) {
             entries = decoded
+            print("Loaded \(entries.count) CBT entries from UserDefaults")
+        }
+    }
+    
+    private func saveToUserDefaults() {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        if let data = try? JSONEncoder().encode(entries) {
+            ud.set(data, forKey: entriesKey)
         }
     }
 }

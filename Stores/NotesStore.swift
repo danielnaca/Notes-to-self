@@ -2,11 +2,13 @@ import Foundation
 import SwiftUI
 import UserNotifications
 import UniformTypeIdentifiers
+import CloudKit
+import WidgetKit
 
 // 📗 Notes Data Store: Manages all note data and operations
 class NotesStore: ObservableObject {
     @Published var notes: [Note] = [] {
-        didSet { save() }
+        didSet { saveNotes() }
     }
     @Published var people: [Note] = [] {
         didSet { savePeople() }
@@ -22,10 +24,11 @@ class NotesStore: ObservableObject {
     private let notesKey = "notes"
     private let peopleKey = "people"
     private let indexKey = "currentIndex"
+    private let cloudKit = CloudKitManager.shared
+    private var isSyncing = false
     
     init() {
-        load()
-        loadPeople()
+        loadFromCloudKit()
     }
     
     func addNote() {
@@ -128,59 +131,122 @@ class NotesStore: ObservableObject {
         }
     }
     
-    private func save() {
-        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
-        if let data = try? JSONEncoder().encode(notes) {
-            ud.set(data, forKey: notesKey)
+    // MARK: - CloudKit Sync Methods
+    
+    private func loadFromCloudKit() {
+        Task {
+            do {
+                // Check if CloudKit is available
+                guard await cloudKit.isCloudKitAvailable() else {
+                    print("CloudKit not available, loading from UserDefaults fallback")
+                    await MainActor.run {
+                        loadFromUserDefaults()
+                    }
+                    return
+                }
+                
+                // Fetch from CloudKit
+                let fetchedNotes = try await cloudKit.fetchNotes(isPersonNote: false)
+                let fetchedPeople = try await cloudKit.fetchNotes(isPersonNote: true)
+                
+                await MainActor.run {
+                    isSyncing = true
+                    self.notes = fetchedNotes
+                    self.people = fetchedPeople
+                    isSyncing = false
+                    print("Loaded \(fetchedNotes.count) notes and \(fetchedPeople.count) people from CloudKit")
+                }
+            } catch {
+                print("Error loading from CloudKit: \(error)")
+                await MainActor.run {
+                    loadFromUserDefaults()
+                }
+            }
         }
-        ud.set(currentIndex, forKey: indexKey)
     }
     
-    private func load() {
-        guard let ud = UserDefaults(suiteName: appGroupID) else { 
-            print("Failed to access UserDefaults")
-            return 
-        }
+    private func saveNotes() {
+        guard !isSyncing else { return }
         
-        // Temporary debugging
-        print("=== DEBUGGING STORAGE ===")
-        let allKeys = ud.dictionaryRepresentation().keys
-        print("All keys: \(Array(allKeys))")
+        // Always save to UserDefaults for widget access
+        saveNotesToUserDefaults()
         
-        if let data = ud.data(forKey: notesKey) {
-            print("Data size: \(data.count) bytes")
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Raw JSON: \(jsonString)")
-            }
-            
+        Task {
             do {
-                let decoded = try JSONDecoder().decode([Note].self, from: data)
-                print("Decoded \(decoded.count) notes")
-                notes = decoded
+                guard await cloudKit.isCloudKitAvailable() else {
+                    print("CloudKit not available, UserDefaults already saved")
+                    return
+                }
+                
+                try await cloudKit.saveNotes(notes, isPersonNote: false)
+                print("Saved \(notes.count) notes to CloudKit")
             } catch {
-                print("Decode error: \(error)")
+                print("Error saving notes to CloudKit: \(error)")
             }
-        } else {
-            print("No data found for key: \(notesKey)")
         }
-        
-        currentIndex = ud.integer(forKey: indexKey)
-        print("Current index: \(currentIndex)")
-        print("=== END DEBUGGING ===")
     }
     
     private func savePeople() {
-        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
-        if let data = try? JSONEncoder().encode(people) {
-            ud.set(data, forKey: peopleKey)
+        guard !isSyncing else { return }
+        
+        // Always save to UserDefaults (not needed for widget, but kept for consistency)
+        savePeopleToUserDefaults()
+        
+        Task {
+            do {
+                guard await cloudKit.isCloudKitAvailable() else {
+                    print("CloudKit not available, UserDefaults already saved")
+                    return
+                }
+                
+                try await cloudKit.saveNotes(people, isPersonNote: true)
+                print("Saved \(people.count) people to CloudKit")
+            } catch {
+                print("Error saving people to CloudKit: \(error)")
+            }
         }
     }
     
-    private func loadPeople() {
+    private func save() {
+        // For currentIndex - still use UserDefaults for simplicity
         guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        ud.set(currentIndex, forKey: indexKey)
+    }
+    
+    // MARK: - UserDefaults Fallback
+    
+    private func loadFromUserDefaults() {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        
+        if let data = ud.data(forKey: notesKey),
+           let decoded = try? JSONDecoder().decode([Note].self, from: data) {
+            notes = decoded
+        }
+        
         if let data = ud.data(forKey: peopleKey),
            let decoded = try? JSONDecoder().decode([Note].self, from: data) {
             people = decoded
+        }
+        
+        currentIndex = ud.integer(forKey: indexKey)
+        print("Loaded from UserDefaults: \(notes.count) notes, \(people.count) people")
+    }
+    
+    private func saveNotesToUserDefaults() {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        if let data = try? JSONEncoder().encode(notes) {
+            ud.set(data, forKey: notesKey)
+            
+            // Tell the widget to reload
+            WidgetCenter.shared.reloadAllTimelines()
+            print("📱 Widget reloaded - \(notes.count) notes saved")
+        }
+    }
+    
+    private func savePeopleToUserDefaults() {
+        guard let ud = UserDefaults(suiteName: appGroupID) else { return }
+        if let data = try? JSONEncoder().encode(people) {
+            ud.set(data, forKey: peopleKey)
         }
     }
     
